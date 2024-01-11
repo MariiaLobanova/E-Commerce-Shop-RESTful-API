@@ -30,8 +30,11 @@ public class JwtServiceImpl implements JwtService {
         return claimsResolvers.apply(claims);
     }
 
+    //private Claims extractAllClaims(String token) {
+    //    return Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token).getBody();
+    //}
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(getSigningKey()).build().parseSignedClaims(token).getPayload();
     }
 
     private Key getSigningKey() {

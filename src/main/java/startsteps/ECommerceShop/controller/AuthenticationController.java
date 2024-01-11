@@ -2,6 +2,7 @@ package startsteps.ECommerceShop.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import startsteps.ECommerceShop.service.AuthService;
 public class AuthenticationController {
     private final AuthService authService;
     @PostMapping("/signup")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<JwtAuthResponse> signup(@RequestBody SighUpRequest request) {
         return ResponseEntity.ok(authService.signup(request));
     }

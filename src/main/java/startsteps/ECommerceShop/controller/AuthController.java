@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class AuthController {
 
-    @GetMapping
+    @GetMapping("/info")
     public ResponseEntity<String> seedata() {
             return ResponseEntity.ok("Here is your resource");
     }
