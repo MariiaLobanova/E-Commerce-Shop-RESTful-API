@@ -1,6 +1,7 @@
 package startsteps.ECommerceShop.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,18 +18,27 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users",
-uniqueConstraints = {@UniqueConstraint(columnNames = "userName"),
-@UniqueConstraint(columnNames = "email")
-})
+@Table(name = "users")
+
 public class User implements UserDetails {
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    @Column(nullable=false)
+    private String username;
+
+    @Column(nullable=false,unique = true)
+    @Email
     private String email;
+
+    @Column(nullable=false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -36,7 +46,7 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
+    public String getUsername(){
         return email;
     }
 
