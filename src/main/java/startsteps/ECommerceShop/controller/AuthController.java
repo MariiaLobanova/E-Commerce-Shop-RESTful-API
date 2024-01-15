@@ -20,24 +20,10 @@ import java.util.List;
 public class AuthController {
     private final UserRepository userRepository;
 
-    @GetMapping("/info")
-    public ResponseEntity<String> seedata() {
-            return ResponseEntity.ok("Here is your resource");
-    }
-
-    @GetMapping("/unsecured")
-    public ResponseEntity<String> unsecuredData() {
-        return ResponseEntity.ok("Unsecured data");
-    }
-
-
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> adminData() {
         List<User> userList = userRepository.findAll();
         return ResponseEntity.ok(userList);
     }
-
-
-
 }
