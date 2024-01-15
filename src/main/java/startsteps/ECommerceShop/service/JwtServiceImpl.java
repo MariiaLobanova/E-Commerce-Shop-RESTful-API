@@ -20,9 +20,9 @@ public class JwtServiceImpl implements JwtService {
     @Value("${token.signing.key}")
     private String jwtSigningKey;
 
+
     @Override
     public String extractUserName(String token) {
-
         return extractClaim(token, Claims::getSubject);
     }
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
@@ -30,9 +30,6 @@ public class JwtServiceImpl implements JwtService {
         return claimsResolvers.apply(claims);
     }
 
-    //private Claims extractAllClaims(String token) {
-    //    return Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token).getBody();
-    //}
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(getSigningKey()).build().parseSignedClaims(token).getPayload();
     }
@@ -49,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 1000 * 60 * 24);
+        Date expirationDate = new Date(now.getTime() + 1000 * 60 * 60 * 24);
 
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -63,11 +60,11 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (userName.equals(userDetails.getUsername())) && !isTokenNotExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenNotExpired(String token) {
+        return extractExpiration(token).before(new Date());  // have to check logic???
     }
 
     private Date extractExpiration(String token) {

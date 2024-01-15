@@ -23,11 +23,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthResponse signup(SighUpRequest sighUpRequest) {
+        Role role = (sighUpRequest.getRole() != null && sighUpRequest.getRole() == Role.ADMIN) ? Role.ADMIN : Role.USER;
+
         var user = User.builder()
                 .username(sighUpRequest.getUsername())
                 .email(sighUpRequest.getEmail())
                 .password(passwordEncoder.encode(sighUpRequest.getPassword()))
-                .role(Role.USER).build();
+                .role(role).build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);
         return JwtAuthResponse.builder().token(jwt).build();
