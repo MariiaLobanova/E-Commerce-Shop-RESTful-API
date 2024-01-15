@@ -43,12 +43,10 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui/index.html").permitAll()
-                        .requestMatchers
-                                ("/api/v1/auth/signup",
-                                "/api/v1/auth/signin",
-                                "/api/v1/unsecured").permitAll()
-                        .requestMatchers(
-                                "/api/v1/info").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/api/v1/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/auth/signup",
+                                "/api/v1/auth/signin")
+                        .permitAll().anyRequest().authenticated())
                 .sessionManagement(manager ->manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
