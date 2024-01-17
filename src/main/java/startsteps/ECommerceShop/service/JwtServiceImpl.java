@@ -35,8 +35,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(jwtSigningKey.getBytes());
     }
 
     @Override
@@ -64,7 +63,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private boolean isTokenNotExpired(String token) {
-        return extractExpiration(token).before(new Date());  // have to check logic???
+        return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
