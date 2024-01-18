@@ -1,5 +1,6 @@
 package startsteps.ECommerceShop.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import startsteps.ECommerceShop.service.AuthService;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Tag(name="Registration/ login system")
 public class AuthenticationController {
     private final AuthService authService;
     @PostMapping("/signup")
