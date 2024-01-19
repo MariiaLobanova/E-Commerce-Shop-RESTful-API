@@ -57,16 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 context.setAuthentication(authToken);
                 SecurityContextHolder.setContext(context);
             }
-
-            if (hasAdminRole(userDetails)) {
-                filterChain.doFilter(request, response);
-            } else {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            }
         }
-    }
-    private boolean hasAdminRole(UserDetails userDetails) {
-        return userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        filterChain.doFilter(request, response);
     }
 }
