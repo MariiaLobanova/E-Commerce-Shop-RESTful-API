@@ -21,6 +21,5 @@ public class UserServiceImpl implements UserService{
                         .orElseThrow(() -> new UsernameNotFoundException("User " +username + " not found"));
             }
         };
-
     }
 }
