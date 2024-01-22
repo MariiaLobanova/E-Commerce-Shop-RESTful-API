@@ -20,7 +20,6 @@ import startsteps.ECommerceShop.service.AuthService;
 public class AuthenticationController {
     private final AuthService authService;
     @PostMapping("/signup")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<JwtAuthResponse> signup(@RequestBody SighUpRequest request) {
         return ResponseEntity.ok(authService.signup(request));
     }
