@@ -18,7 +18,7 @@ public class Product {
     private static final long serialVersionUID = 1L;
     @Id
     @Column
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
     @NotBlank
     @Column
