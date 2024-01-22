@@ -19,7 +19,7 @@ public class AuthorizationController {
     private final UserRepository userRepository;
 
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<User>> adminData() {
         List<User> userList = userRepository.findAll();
         return ResponseEntity.ok(userList);
