@@ -1,12 +1,15 @@
 package startsteps.ECommerceShop.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.service.ProductService;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -15,8 +18,9 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping
-    public List<Product> getAllProduct(){
-        return productService.getAllProduct();
+    public Page<Product> getAllProduct(
+            @PageableDefault(page = 0,size = 5)Pageable pageable){
+        return productService.getAllProduct(pageable);
     }
 
     @PostMapping("/add")
@@ -31,8 +35,14 @@ public class ProductController {
         productService.deleteProduct(productId);
     }
 
+
+    @GetMapping("/{productId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Optional<Product> getProductById(@PathVariable Long productId){ return productService.getProductById(productId);}
+
     @GetMapping("/{name}")
     public List<Product> findProductsByName(@PathVariable String name) {
         return productService.findProductsByName(name);
     }
+
 }
