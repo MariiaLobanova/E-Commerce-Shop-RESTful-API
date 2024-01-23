@@ -17,18 +17,18 @@ import lombok.NoArgsConstructor;
 public class Product {
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "Id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long productId;
     @NotBlank
-    @Column(name = "Name of product")
+    @Column(name = "name")
     String name;
-    @Column(name = "Description")
+    @Column(name = "description")
     String description;
     @Min(0)
-    @Column(name = "Price")
+    @Column(name = "price")
     double price;
     @Min(0)
-    @Column(name = "Quantity in stock")
+    @Column(name = "quantity")
     int quantity;
 }
