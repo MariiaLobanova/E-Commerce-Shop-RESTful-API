@@ -30,4 +30,9 @@ public class ProductController {
     public void deleteProductById(@PathVariable Long productId){
         productService.deleteProduct(productId);
     }
+
+    @GetMapping("/{name}")
+    public List<Product> findProductsByName(@PathVariable String name) {
+        return productService.findProductsByName(name);
+    }
 }
