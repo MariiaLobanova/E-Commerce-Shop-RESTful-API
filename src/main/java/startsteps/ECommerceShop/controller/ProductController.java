@@ -24,4 +24,10 @@ public class ProductController {
     public Product addProduct(@RequestBody Product product){
         return productService.addProduct(product);
     }
+
+    @DeleteMapping("/delete/{productId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteProductById(@PathVariable Long productId){
+        productService.deleteProduct(productId);
+    }
 }
