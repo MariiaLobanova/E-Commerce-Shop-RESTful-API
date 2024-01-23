@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 public class Product {
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
     @NotBlank
     @Column(name = "name")
