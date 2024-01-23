@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui/index.html").permitAll()
-                        .requestMatchers("/products").permitAll()
+                        .requestMatchers("/products",
+                                "products/{name}").permitAll()
                         .requestMatchers("/api/v1/admin",
                                 "/products/add",
                                 "products/delete/{id}",

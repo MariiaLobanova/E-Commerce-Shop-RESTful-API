@@ -26,5 +26,8 @@ public class ProductService {
     public Optional<Product> getProductById(Long id){
         return productRepository.findById(id);
     }
+    public List<Product> findProductsByName(String name) {
+        return productRepository.findByName(name);
+    }
 }
 

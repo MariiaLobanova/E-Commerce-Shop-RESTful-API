@@ -35,7 +35,14 @@ public class ProductController {
         productService.deleteProduct(productId);
     }
 
+
     @GetMapping("/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Optional<Product> getProductById(@PathVariable Long productId){ return productService.getProductById(productId);}
+
+    @GetMapping("/{name}")
+    public List<Product> findProductsByName(@PathVariable String name) {
+        return productService.findProductsByName(name);
+    }
+
 }
