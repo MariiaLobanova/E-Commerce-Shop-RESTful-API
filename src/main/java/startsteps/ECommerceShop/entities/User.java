@@ -40,6 +40,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "cartId")
+    private Cart cart;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
