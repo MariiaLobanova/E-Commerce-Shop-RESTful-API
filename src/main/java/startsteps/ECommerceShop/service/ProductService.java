@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import startsteps.ECommerceShop.entities.Product;
+import startsteps.ECommerceShop.exeptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.ProductRepository;
 
 import java.util.List;
@@ -28,6 +29,12 @@ public class ProductService {
     }
     public List<Product> findProductsByName(String name) {
         return productRepository.findByName(name);
+    }
+    public Product updateProduct (Long id, int quantity){
+        return productRepository.findById(id).map(product -> {product.setQuantity(quantity);
+            return productRepository.save(product);
+        })
+                .orElseThrow(()->new ProductNotFoundException("Product with ID " + id + " not found"));
     }
 }
 

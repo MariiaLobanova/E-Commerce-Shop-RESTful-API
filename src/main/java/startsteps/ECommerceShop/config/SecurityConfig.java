@@ -47,7 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin",
                                 "/products/add",
                                 "products/delete/{id}",
-                                "products/{productId}").hasAuthority("ADMIN")
+                                "products/{productId}"
+                                ,"products/update/{productId}").hasAuthority("ADMIN")
                         .requestMatchers("/api/v1/auth/signup",
                                 "/api/v1/auth/signin")
                         .permitAll().anyRequest().authenticated())

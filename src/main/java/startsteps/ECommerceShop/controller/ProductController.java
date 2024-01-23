@@ -43,4 +43,10 @@ public class ProductController {
     public List<Product> findProductsByName(@PathVariable String name) {
         return productService.findProductsByName(name);
     }
+    @PutMapping("/update/{productId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Product updateProduct(@PathVariable Long productId,@RequestParam int quantity){
+        return productService.updateProduct(productId, quantity);
+    }
+
 }
