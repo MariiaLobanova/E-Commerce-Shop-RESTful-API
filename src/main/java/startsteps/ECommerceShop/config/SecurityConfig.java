@@ -47,8 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin",
                                 "/products/add",
                                 "products/delete/{id}",
-                                "products/id/{productId}").hasAuthority("ADMIN")
-                        .requestMatchers("/api/v1/auth/signup",
+                                "products/id/{productId}",
+                                "/api/v1/auth/signup",
                                 "/api/v1/auth/signin")
                         .permitAll().anyRequest().authenticated())
                 .sessionManagement(manager ->manager.sessionCreationPolicy(STATELESS))

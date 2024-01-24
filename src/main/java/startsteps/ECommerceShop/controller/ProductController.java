@@ -14,9 +14,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
     @GetMapping
     public Page<Product> getAllProduct(
             @PageableDefault(page = 0,size = 5)Pageable pageable){
@@ -43,4 +46,10 @@ public class ProductController {
     public List<Product> findProductsByName(@PathVariable String name) {
         return productService.findProductsByName(name);
     }
+    @PutMapping("/update/{productId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Product updateProduct(@PathVariable Long productId,@RequestParam int quantity){
+        return productService.updateProduct(productId, quantity);
+    }
+
 }
