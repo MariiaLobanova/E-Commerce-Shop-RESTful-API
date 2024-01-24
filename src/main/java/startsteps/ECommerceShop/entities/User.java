@@ -44,7 +44,13 @@ public class User implements UserDetails {
     @JoinColumn(name = "cartId")
     private Cart cart;
 
-
+    public User(Long id, String username, String email, String password, Role role) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
