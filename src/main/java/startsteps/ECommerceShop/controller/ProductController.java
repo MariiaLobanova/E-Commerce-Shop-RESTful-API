@@ -51,5 +51,4 @@ public class ProductController {
     public Product updateProduct(@PathVariable Long productId,@RequestParam int quantity){
         return productService.updateProduct(productId, quantity);
     }
-
 }

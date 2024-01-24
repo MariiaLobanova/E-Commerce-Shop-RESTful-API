@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import startsteps.ECommerceShop.service.UserService;
 
+import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasAuthority;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -47,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin",
                                 "/products/add",
                                 "products/delete/{id}",
+                                "products/update/{productId}").hasAuthority("ADMIN")
+                        .requestMatchers(
                                 "products/id/{productId}",
                                 "/api/v1/auth/signup",
                                 "/api/v1/auth/signin")

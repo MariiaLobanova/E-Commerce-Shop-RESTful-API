@@ -33,8 +33,7 @@ public class ProductService {
     public Product updateProduct (Long id, int quantity){
         return productRepository.findById(id).map(product -> {product.setQuantity(quantity);
             return productRepository.save(product);
-        })
-                .orElseThrow(()->new ProductNotFoundException("Product with ID " + id + " not found"));
+        }).orElseThrow(()->new ProductNotFoundException("Product with ID " + id + " not found"));
     }
 }
 
