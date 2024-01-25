@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -27,8 +28,8 @@ public class Cart {
     private User user;
 
     @Column(name = "cartProducts")
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private List<CartProduct> cartProductList;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<CartProduct> cartProductList = new ArrayList<>();
 
     @Column(name = "totalPrice")
     private double totalPrice;

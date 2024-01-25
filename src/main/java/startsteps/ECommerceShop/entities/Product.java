@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -31,4 +34,7 @@ public class Product {
     @Min(0)
     @Column(name = "quantity")
     int quantity;
+    @Column(name = "cartProducts")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<CartProduct> cartProductList = new ArrayList<>();
 }
