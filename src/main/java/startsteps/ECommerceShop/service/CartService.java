@@ -67,7 +67,7 @@ public class CartService {
                 cartProduct.setQuantity(quantity);
                 cartProduct.setPrice(product.getPrice() * quantity);
                 cart.getCartProductList().add(cartProduct);
-                cartProduct.setCart(cart);//2
+                cartProduct.setCart(cart);
             }
             updateCartTotalPrice(cart);
             cartRepository.save(cart);
