@@ -1,5 +1,6 @@
 package startsteps.ECommerceShop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ public class Product {
     @Min(0)
     @Column(name = "quantity")
     int quantity;
+    @JsonIgnore
     @Column(name = "cartProducts")
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<CartProduct> cartProductList = new ArrayList<>();

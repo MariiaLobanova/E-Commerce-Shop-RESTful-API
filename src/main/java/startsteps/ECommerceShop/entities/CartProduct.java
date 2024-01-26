@@ -1,10 +1,7 @@
 package startsteps.ECommerceShop.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
@@ -27,10 +24,12 @@ public class CartProduct {
     private double price;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "productId")
     private Product product;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "cartId")
     private Cart cart;
 

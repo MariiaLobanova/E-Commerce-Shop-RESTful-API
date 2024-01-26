@@ -1,7 +1,9 @@
 package startsteps.ECommerceShop.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
@@ -20,17 +22,28 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductService productService;
     private final UserRepository userRepository;
 
+    @Transactional
     public CartResponse addProductToCart(CartRequest cartRequest, User user) {
+        log.info("Adding product to cart for user: {}", user.getUsername());
+
         int quantity = cartRequest.getQuantity();
         Long productId = cartRequest.getProductId();
 
         Cart cart = user.getCart();
+        if (cart == null) {
+            cart = new Cart();
+            cart.setUser(user);
+            cart.setCartProductList(new ArrayList<>());
+            user.setCart(cart);
+            userRepository.save(user);
+        }
         if (cart.getCartProductList() == null) {
             cart.setCartProductList(new ArrayList<>());
         }
@@ -47,13 +60,14 @@ public class CartService {
                 CartProduct cartProduct = cartProductOptional.get();
                 cartProduct.setQuantity(cartProduct.getQuantity() + quantity);
                 cartProduct.setPrice(product.getPrice() * cartProduct.getQuantity());
-            } else {
 
+            } else {
                 CartProduct cartProduct = new CartProduct();
                 cartProduct.setProduct(product);
                 cartProduct.setQuantity(quantity);
                 cartProduct.setPrice(product.getPrice() * quantity);
                 cart.getCartProductList().add(cartProduct);
+                cartProduct.setCart(cart);//2
             }
             updateCartTotalPrice(cart);
             cartRepository.save(cart);
@@ -62,6 +76,8 @@ public class CartService {
             cartResponse.setMessage("Product added to cart successfully");
             cartResponse.setCartProducts(createCartProduct(cart.getCartProductList()));
             cartResponse.setTotalPrice(cart.getTotalPrice());
+
+            log.info("Cart state after update: {}", user.getCart());
 
             return cartResponse;
 

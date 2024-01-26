@@ -1,10 +1,7 @@
 package startsteps.ECommerceShop.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +20,13 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
+    @ToString.Exclude
     @OneToOne
     @JoinColumn(name = "id")
     private User user;
 
     @Column(name = "cartProducts")
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<CartProduct> cartProductList = new ArrayList<>();
 
     @Column(name = "totalPrice")
