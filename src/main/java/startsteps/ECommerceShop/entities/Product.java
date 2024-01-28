@@ -1,5 +1,6 @@
 package startsteps.ECommerceShop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -31,4 +35,8 @@ public class Product {
     @Min(0)
     @Column(name = "quantity")
     int quantity;
+    @JsonIgnore
+    @Column(name = "cartProducts")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<CartProduct> cartProductList = new ArrayList<>();
 }
