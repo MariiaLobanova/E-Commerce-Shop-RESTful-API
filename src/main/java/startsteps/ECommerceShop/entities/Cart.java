@@ -1,5 +1,6 @@
 package startsteps.ECommerceShop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class Cart {
 
     @ToString.Exclude
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "id")
     private User user;
 

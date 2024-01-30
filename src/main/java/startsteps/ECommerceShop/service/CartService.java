@@ -16,9 +16,7 @@ import startsteps.ECommerceShop.request.CartRequest;
 import startsteps.ECommerceShop.responce.CartProductResponse;
 import startsteps.ECommerceShop.responce.CartResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,4 +96,25 @@ public class CartService {
                 cartProduct.getQuantity(),
                 cartProduct.getPrice())).collect(Collectors.toList());
         }
+
+    @Transactional
+    public CartResponse getCart(User user){
+        Cart cart = user.getCart();
+        log.info("get cart: {}", user.getCart());
+
+        List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
+                .map(this::mapToCartProductResponse).collect(Collectors.toList());
+
+        return new CartResponse("Cart details retrieved successfully", cartProductResponses, cart.getTotalPrice());
+    }
+
+    private CartProductResponse mapToCartProductResponse(CartProduct cartProduct){
+        Product product = cartProduct.getProduct();
+        return new CartProductResponse(
+                product.getProductId(),
+                product.getName(),
+                product.getQuantity(),
+                product.getPrice());
+    }
+
 }

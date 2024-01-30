@@ -1,5 +1,6 @@
 package startsteps.ECommerceShop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -39,6 +40,7 @@ public class User implements UserDetails {
 
     @ToString.Exclude
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
     @JoinColumn(name = "cartId")
     private Cart cart;
 
