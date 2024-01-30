@@ -38,9 +38,9 @@ public class CartController {
 
     @GetMapping("/mycart")
     @PreAuthorize("hasAuthority('USER')")
-   public CartResponse getCart(User user){
-        User user1 = authService.getAuthenticatedUser();
-        CartResponse cartResponse = cartService.getCart(user1);
+   public CartResponse getCart(){
+        User user = authService.getAuthenticatedUser();
+        CartResponse cartResponse = cartService.getCart(user);
         return cartResponse;
     }
 }

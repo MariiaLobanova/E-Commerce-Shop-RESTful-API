@@ -8,7 +8,6 @@ import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
-import startsteps.ECommerceShop.exceptions.EmptyCartException;
 import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.CartRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
@@ -90,11 +89,10 @@ public class CartService {
             cart.setTotalPrice(totalPrice);
         }
         private List<CartProductResponse> createCartProduct(List<CartProduct> cartProducts){
-        return cartProducts.stream().map(cartProduct -> new CartProductResponse(
-                cartProduct.getProduct().getProductId(),
-                cartProduct.getProduct().getName(),
-                cartProduct.getQuantity(),
-                cartProduct.getPrice())).collect(Collectors.toList());
+
+        return cartProducts.stream()
+                    .map(cartProduct -> new CartProductResponse(cartProduct.getProduct()))
+                    .collect(Collectors.toList());
         }
 
     @Transactional
@@ -102,9 +100,9 @@ public class CartService {
         Cart cart = user.getCart();
 
         if (cart == null || cart.getCartProductList().isEmpty()){
-            throw new EmptyCartException("You haven't added anything yet, your cart is empty");
+            return new CartResponse("You haven't added anything yet, your cart is empty",Collections.emptyList(),0.0);
         }
-        log.info("get cart: {}", user.getCart());
+        log.info("get cart: {}", cart);
 
         List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
                 .map(this::mapToCartProductResponse).collect(Collectors.toList());
@@ -114,11 +112,6 @@ public class CartService {
 
     private CartProductResponse mapToCartProductResponse(CartProduct cartProduct){
         Product product = cartProduct.getProduct();
-        return new CartProductResponse(
-                product.getProductId(),
-                product.getName(),
-                product.getQuantity(),
-                product.getPrice());
+        return new CartProductResponse(product);
     }
-
 }

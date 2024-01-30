@@ -57,14 +57,4 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorResponse);
     }
-    @ExceptionHandler(EmptyCartException.class)
-    public ResponseEntity<Object> handleEmptyCartException(EmptyCartException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                exception.getMessage()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(errorResponse);
-    }
 }
