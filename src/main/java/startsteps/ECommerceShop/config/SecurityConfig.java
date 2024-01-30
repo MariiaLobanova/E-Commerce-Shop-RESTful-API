@@ -46,7 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/products",
                                 "products/name/{name}",
                                 "/cart/add",
-                                "/cart/mycart").permitAll()
+                                "/cart/mycart",
+                                "/cart/remove/{productId}").permitAll()
                         .requestMatchers("/api/v1/admin",
                                 "/products/add",
                                 "products/delete/{id}",
