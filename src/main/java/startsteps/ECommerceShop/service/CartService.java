@@ -8,8 +8,8 @@ import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
-import startsteps.ECommerceShop.exeptions.ProductNotFoundException;
-import startsteps.ECommerceShop.exeptions.UserNotFoundException;
+import startsteps.ECommerceShop.exceptions.EmptyCartException;
+import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.CartRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
 import startsteps.ECommerceShop.request.CartRequest;
@@ -100,6 +100,10 @@ public class CartService {
     @Transactional
     public CartResponse getCart(User user){
         Cart cart = user.getCart();
+
+        if (cart == null || cart.getCartProductList().isEmpty()){
+            throw new EmptyCartException("You haven't added anything yet, your cart is empty");
+        }
         log.info("get cart: {}", user.getCart());
 
         List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
