@@ -1,4 +1,4 @@
-package startsteps.ECommerceShop.exeptions;
+package startsteps.ECommerceShop.exceptions;
 
 public class PasswordNotCorrectException extends RuntimeException{
     public PasswordNotCorrectException(String message){

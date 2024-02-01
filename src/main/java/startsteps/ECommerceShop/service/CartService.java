@@ -8,17 +8,14 @@ import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
-import startsteps.ECommerceShop.exeptions.ProductNotFoundException;
-import startsteps.ECommerceShop.exeptions.UserNotFoundException;
+import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.CartRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
 import startsteps.ECommerceShop.request.CartRequest;
 import startsteps.ECommerceShop.responce.CartProductResponse;
 import startsteps.ECommerceShop.responce.CartResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +39,6 @@ public class CartService {
             cart.setUser(user);
             cart.setCartProductList(new ArrayList<>());
             user.setCart(cart);
-            userRepository.save(user);
         }
         if (cart.getCartProductList() == null) {
             cart.setCartProductList(new ArrayList<>());
@@ -92,10 +88,24 @@ public class CartService {
             cart.setTotalPrice(totalPrice);
         }
         private List<CartProductResponse> createCartProduct(List<CartProduct> cartProducts){
-        return cartProducts.stream().map(cartProduct -> new CartProductResponse(
-                cartProduct.getProduct().getProductId(),
-                cartProduct.getProduct().getName(),
-                cartProduct.getQuantity(),
-                cartProduct.getPrice())).collect(Collectors.toList());
+
+        return cartProducts.stream()
+                    .map(cartProduct -> new CartProductResponse(cartProduct))
+                    .collect(Collectors.toList());
         }
+
+    @Transactional
+    public CartResponse getCart(User user){
+        Cart cart = user.getCart();
+
+        if (cart == null || cart.getCartProductList().isEmpty()){
+            return new CartResponse("You haven't added anything yet, your cart is empty",Collections.emptyList(),0.0);
+        }
+        log.info("get cart: {}", cart);
+
+        List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
+                .map(CartProductResponse::new).collect(Collectors.toList());
+
+        return new CartResponse("Cart details retrieved successfully", cartProductResponses, cart.getTotalPrice());
+    }
 }

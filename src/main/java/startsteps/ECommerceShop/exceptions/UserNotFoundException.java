@@ -1,4 +1,4 @@
-package startsteps.ECommerceShop.exeptions;
+package startsteps.ECommerceShop.exceptions;
 
 public class UserNotFoundException extends RuntimeException{
     public UserNotFoundException(String message){

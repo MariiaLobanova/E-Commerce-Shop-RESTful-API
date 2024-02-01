@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import startsteps.ECommerceShop.entities.Product;
-import startsteps.ECommerceShop.exeptions.ProductNotFoundException;
+import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.ProductRepository;
 
 import java.util.List;

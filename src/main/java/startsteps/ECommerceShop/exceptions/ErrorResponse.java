@@ -1,4 +1,4 @@
-package startsteps.ECommerceShop.exeptions;
+package startsteps.ECommerceShop.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
