@@ -39,7 +39,6 @@ public class CartService {
             cart.setUser(user);
             cart.setCartProductList(new ArrayList<>());
             user.setCart(cart);
-            userRepository.save(user);
         }
         if (cart.getCartProductList() == null) {
             cart.setCartProductList(new ArrayList<>());
