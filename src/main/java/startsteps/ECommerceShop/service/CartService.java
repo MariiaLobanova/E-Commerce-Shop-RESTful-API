@@ -90,7 +90,7 @@ public class CartService {
         private List<CartProductResponse> createCartProduct(List<CartProduct> cartProducts){
 
         return cartProducts.stream()
-                    .map(cartProduct -> new CartProductResponse(cartProduct.getProduct()))
+                    .map(cartProduct -> new CartProductResponse(cartProduct))
                     .collect(Collectors.toList());
         }
 
@@ -104,14 +104,9 @@ public class CartService {
         log.info("get cart: {}", cart);
 
         List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
-                .map(this::mapToCartProductResponse).collect(Collectors.toList());
+                .map(CartProductResponse::new).collect(Collectors.toList());
 
         return new CartResponse("Cart details retrieved successfully", cartProductResponses, cart.getTotalPrice());
-    }
-
-    private CartProductResponse mapToCartProductResponse(CartProduct cartProduct){
-        Product product = cartProduct.getProduct();
-        return new CartProductResponse(product);
     }
 
     @Transactional
@@ -131,7 +126,7 @@ public class CartService {
             cartRepository.save(cart);
 
             List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
-                    .map(this::mapToCartProductResponse).collect(Collectors.toList());
+                    .map(CartProductResponse::new).collect(Collectors.toList());
 
             return new CartResponse("Product with id" + productId + "removed successfully", cartProductResponses, cart.getTotalPrice());
         } else {
