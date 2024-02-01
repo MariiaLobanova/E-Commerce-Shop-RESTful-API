@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
+import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
 import startsteps.ECommerceShop.request.CartRequest;
 import startsteps.ECommerceShop.responce.CartResponse;
@@ -41,6 +42,14 @@ public class CartController {
    public CartResponse getCart(){
         User user = authService.getAuthenticatedUser();
         CartResponse cartResponse = cartService.getCart(user);
+        return cartResponse;
+    }
+    @DeleteMapping("remove/{productId}")
+    @PreAuthorize("hasAuthority('USER')")
+    public CartResponse removeProduct(@PathVariable Long productId){
+        User user = authService.getAuthenticatedUser();
+        CartResponse cartResponse = cartService.removeProduct(productId, user);
+
         return cartResponse;
     }
 }
