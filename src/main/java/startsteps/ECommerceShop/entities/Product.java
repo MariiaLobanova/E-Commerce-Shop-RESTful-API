@@ -39,4 +39,12 @@ public class Product {
     @Column(name = "cartProducts")
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<CartProduct> cartProductList = new ArrayList<>();
+
+    public Product(Long productId, String name, String description, double price, int quantity) {
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.quantity = quantity;
+    }
 }
