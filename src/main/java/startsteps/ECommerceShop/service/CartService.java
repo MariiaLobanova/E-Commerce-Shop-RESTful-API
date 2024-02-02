@@ -138,14 +138,12 @@ public class CartService {
 
     @Transactional
     public void clearCart(User user) {
-        try{
             Cart cart = user.getCart();
         if(cart!=null && !cart.getCartProductList().isEmpty()) {
             cart.getCartProductList().clear();
             updateCartTotalPrice(cart);
             cartRepository.save(cart);
+            log.info("Cart is empty for user: {}", user.getUsername());
         }
-        }catch (Exception exception){
-            exception.printStackTrace();}
     }
 }
