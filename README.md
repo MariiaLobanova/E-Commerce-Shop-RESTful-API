@@ -20,7 +20,7 @@ Key Features
  Logging: Implement logging in SLF4J for efficient debugging, bug tracking, and system monitoring.
 
 Diagram for the application
-![](/Users/maria/Downloads/Image 02.02.24 at 15.39.jpeg)
+![img_1.png](img_1.png)
 
 Getting Started
 Clone the Repository:
