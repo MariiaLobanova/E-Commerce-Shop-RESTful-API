@@ -1,14 +1,15 @@
 package startsteps.ECommerceShop.service;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import startsteps.ECommerceShop.entities.CartProduct;
-import startsteps.ECommerceShop.entities.Order;
-import startsteps.ECommerceShop.entities.OrderStatus;
-import startsteps.ECommerceShop.entities.User;
+import startsteps.ECommerceShop.entities.*;
+import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.CartProductRepository;
 import startsteps.ECommerceShop.repository.OrderRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
+import startsteps.ECommerceShop.responce.CartProductResponse;
 import startsteps.ECommerceShop.responce.CartResponse;
 import startsteps.ECommerceShop.responce.OrderResponse;
 
@@ -18,18 +19,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
+@AllArgsConstructor
+
 public class OrderService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartService cartService;
     private final CartProductRepository cartProductRepository;
-
-    public OrderService(UserRepository userRepository, OrderRepository orderRepository, CartService cartService, CartProductRepository cartProductRepository) {
-        this.userRepository = userRepository;
-        this.orderRepository = orderRepository;
-        this.cartService = cartService;
-        this.cartProductRepository = cartProductRepository;
-    }
+    private final ProductService productService;
 
     @Transactional
     public OrderResponse placeOrder(User user){
@@ -37,6 +35,17 @@ public class OrderService {
 
         if (cartResponse.getCartProducts().isEmpty()){
             return new OrderResponse("Can not place empty order", Collections.emptyList(),0.0);
+        }
+        List <CartProductResponse> cartProducts = cartResponse.getCartProducts();
+        for(CartProductResponse cartProductResponse: cartProducts){
+            Long productId = cartProductResponse.getProductId();
+            int orderQuantity = cartProductResponse.getQuantity();
+
+            Product product = productService.getProductById(productId)
+                    .orElseThrow(()-> new ProductNotFoundException("Product with Id " +productId+ " not found"));
+            if(product.getQuantity()<orderQuantity){
+                return  new OrderResponse("Insufficient stock for product "+product.getName(), cartProducts, 0.0);
+            }
         }
 
         Order order = new Order();
@@ -49,13 +58,20 @@ public class OrderService {
         List<CartProduct> productsInOrder = productsInCart.stream()
                 .map(cartProduct -> cartProductRepository.findById(cartProduct.getCartProductId())
                         .orElseThrow(()->new IllegalStateException("Cart Products not found"))).collect(Collectors.toList());
-
         order.setOrderCartProducts(productsInOrder);
         order.setTotal(user.getCart().getTotalPrice());
 
         Order savedOrder = orderRepository.save(order);
 
+        for (CartProductResponse cartProductResponse : cartProducts){
+            Long productId = cartProductResponse.getProductId();
+            int orderQuantity = cartProductResponse.getQuantity();
+
+            productService.updateProduct(productId,orderQuantity);
+        }
+
         cartService.clearCart(user);
+        log.info("cart after cleaaring");
 
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setMessage("Order placed successfully!");
