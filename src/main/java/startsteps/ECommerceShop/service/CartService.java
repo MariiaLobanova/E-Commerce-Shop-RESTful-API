@@ -128,7 +128,7 @@ public class CartService {
             List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
                     .map(CartProductResponse::new).collect(Collectors.toList());
 
-            return new CartResponse("Product with id" + productId + "removed successfully", cartProductResponses, cart.getTotalPrice());
+            return new CartResponse("Product with id " + productId + " removed successfully", cartProductResponses, cart.getTotalPrice());
         } else {
             throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
         }
