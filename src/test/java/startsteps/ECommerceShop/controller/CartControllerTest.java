@@ -11,16 +11,24 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
+import startsteps.ECommerceShop.request.CartRequest;
 import startsteps.ECommerceShop.responce.CartResponse;
 import startsteps.ECommerceShop.service.*;
 
+import static org.hamcrest.Matchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,7 +52,24 @@ class CartControllerTest {
     AuthServiceImpl authService;
 
     @Test
-    void addToCart() {
+    void addToCart() throws Exception {
+        User user = new User(1L, "Anton", "anton@gmail.com", "0000", USER);
+
+        CartRequest cartRequest = new CartRequest(1L,12);
+        CartResponse cartResponse = new CartResponse("Product added successfully!", Collections.emptyList(),0.00);
+
+        Mockito.when(authService.getAuthenticatedUser()).thenReturn(user);
+        Mockito.verify(cartService).addProductToCart(cartRequest, user);
+
+        given(cartService.addProductToCart(cartRequest,user)).willReturn(cartResponse);
+
+       mockMvc.perform(post("/cart/add").with(csrf()))
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.message").value("Product added successfully!"))
+               .andExpect(jsonPath("$.cartProducts").isArray())
+               .andExpect(jsonPath("$.totalPrice").value(0.00));;
+
     }
 
     @Test
@@ -69,13 +94,6 @@ class CartControllerTest {
 
         given(cartService.getCart(user1)).willReturn(new CartResponse("Cart details retrieved successfully", List.of(), 20.00));
 
-        MvcResult mvcResult = mockMvc.perform(get("/cart/mycart"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String contentType = mvcResult.getResponse().getContentType();
-        System.out.println("Response Content Type: " + contentType);
-
         mockMvc.perform(get("/cart/mycart"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -85,6 +103,20 @@ class CartControllerTest {
     }
 
     @Test
-    void removeProduct() {
+    void removeProduct() throws Exception {
+        User user = new User(1L, "Anton", "anton@gmail.com", "0000", USER);
+        long productIdToRemove = 8L;
+
+        CartResponse cartResponseAfterRemoval = new CartResponse("Product removed successfully!", Collections.emptyList(), 0.00);
+
+        Mockito.when(authService.getAuthenticatedUser()).thenReturn(user);
+        given(cartService.removeProduct(productIdToRemove, user)).willReturn(cartResponseAfterRemoval);
+
+        mockMvc.perform(delete("/cart/remove/{productId}", productIdToRemove).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Product removed successfully!"))
+                .andExpect(jsonPath("$.cartProducts").isArray())
+                .andExpect(jsonPath("$.totalPrice").value(0.00));
     }
 }
