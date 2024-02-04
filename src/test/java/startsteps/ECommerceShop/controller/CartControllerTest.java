@@ -1,6 +1,8 @@
 package startsteps.ECommerceShop.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -9,8 +11,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import startsteps.ECommerceShop.entities.Cart;
@@ -18,11 +22,13 @@ import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
 import startsteps.ECommerceShop.request.CartRequest;
+import startsteps.ECommerceShop.responce.CartProductResponse;
 import startsteps.ECommerceShop.responce.CartResponse;
 import startsteps.ECommerceShop.service.*;
 
 import static org.hamcrest.Matchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,28 +58,33 @@ class CartControllerTest {
     AuthServiceImpl authService;
 
     @Test
-    void addToCart() throws Exception {
+    void addToCartSuccesfully() throws Exception {
+        CartRequest cartRequest = new CartRequest(1L, 2);
         User user = new User(1L, "Anton", "anton@gmail.com", "0000", USER);
 
-        CartRequest cartRequest = new CartRequest(1L,12);
-        CartResponse cartResponse = new CartResponse("Product added successfully!", Collections.emptyList(),0.00);
+        CartResponse cartResponse = new CartResponse("Product added to cart successfully",
+                Collections.emptyList(), 100.0);
 
-        Mockito.when(authService.getAuthenticatedUser()).thenReturn(user);
-        Mockito.verify(cartService).addProductToCart(cartRequest, user);
+        when(authService.getAuthenticatedUser()).thenReturn(user);
 
-        given(cartService.addProductToCart(cartRequest,user)).willReturn(cartResponse);
+        given(cartService.addProductToCart(cartRequest, user)).willReturn(cartResponse);
 
-       mockMvc.perform(post("/cart/add").with(csrf()))
-               .andExpect(status().isOk())
-               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-               .andExpect(jsonPath("$.message").value("Product added successfully!"))
-               .andExpect(jsonPath("$.cartProducts").isArray())
-               .andExpect(jsonPath("$.totalPrice").value(0.00));;
+        mockMvc.perform(post("/cart/add")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(cartRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Product added to cart successfully"))
+                .andExpect(jsonPath("$.cartProducts").isArray())
+                .andExpect(jsonPath("$.totalPrice").value(100.00));
+    }
 
+    private String asJsonString(Object obj) throws Exception {
+        return new ObjectMapper().writeValueAsString(obj);
     }
 
     @Test
-    void getCart() throws Exception{
+    void getCartSuccesfully() throws Exception{
         User user1 = new User(1L, "Anton", "anton@gmail.com", "0000", USER);
 
         Product product1 = new Product(1L, "product1", "description1", 1.00, 5);
@@ -103,7 +114,7 @@ class CartControllerTest {
     }
 
     @Test
-    void removeProduct() throws Exception {
+    void removeProductSuccessfully() throws Exception {
         User user = new User(1L, "Anton", "anton@gmail.com", "0000", USER);
         long productIdToRemove = 8L;
 
