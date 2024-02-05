@@ -62,6 +62,8 @@ public class OrderService {
         order.setOrderCartProducts(productsInOrder);
         order.setTotal(user.getCart().getTotalPrice());
 
+        clearOrderCartProducts(order);
+
         Order savedOrder = orderRepository.save(order);
 
         for (CartProductResponse cartProductResponse : cartProducts) {
@@ -72,7 +74,6 @@ public class OrderService {
         }
 
         cartService.clearCart(user);
-        log.info("cart after cleaaring");
 
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setMessage("Order placed successfully!");
@@ -80,6 +81,10 @@ public class OrderService {
         orderResponse.setTotalPrice(cartResponse.getTotalPrice());
 
         return orderResponse;
+    }
+    private void clearOrderCartProducts(Order order) {
+        order.getOrderCartProducts().forEach(cartProduct -> cartProduct.setOrder(null));
+        order.getOrderCartProducts().clear();
     }
 
     @Transactional

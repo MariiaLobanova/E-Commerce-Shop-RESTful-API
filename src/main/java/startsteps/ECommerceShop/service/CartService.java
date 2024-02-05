@@ -11,6 +11,7 @@ import startsteps.ECommerceShop.entities.User;
 import startsteps.ECommerceShop.exceptions.CartNotFoundException;
 import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.exceptions.UnauthorizedAccessException;
+import startsteps.ECommerceShop.repository.CartProductRepository;
 import startsteps.ECommerceShop.repository.CartRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
 import startsteps.ECommerceShop.request.CartRequest;
@@ -27,6 +28,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductService productService;
     private final UserRepository userRepository;
+    private final CartProductRepository cartProductRepository;
 
     @Transactional
     public CartResponse addProductToCart(CartRequest cartRequest, User user) {
@@ -136,10 +138,14 @@ public class CartService {
         }
     }
 
-    @Transactional
+ @Transactional
     public void clearCart(User user) {
             Cart cart = user.getCart();
         if(cart!=null && !cart.getCartProductList().isEmpty()) {
+            List <CartProduct> cartProductToRemove = cart.getCartProductList();
+            for(CartProduct cp: cartProductToRemove){
+                cp.setOrder(null);
+            }
             cart.getCartProductList().clear();
             updateCartTotalPrice(cart);
             cartRepository.save(cart);
