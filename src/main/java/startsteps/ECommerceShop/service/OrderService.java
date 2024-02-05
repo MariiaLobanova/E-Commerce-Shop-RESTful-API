@@ -107,9 +107,14 @@ public class OrderService {
                 order.getOrderStatus());
     }
     public OrderStatusResponse cancelOrder(Order order){
-        order.setOrderStatus(OrderStatus.CANCELLED);
-        orderRepository.save(order);
+        OrderStatus currentStatus = order.getOrderStatus();
 
+        if (currentStatus == OrderStatus.PAID) {
+            order.setOrderStatus(OrderStatus.CANCELLED);
+            orderRepository.save(order);
+        } else {
+            throw new IllegalStateException("Sorry, you can not cancel your order since it is dispatched");
+        }
         return new OrderStatusResponse("Your order is cancelled",
                 Collections.emptyList(),
                 order.getTotal(),
