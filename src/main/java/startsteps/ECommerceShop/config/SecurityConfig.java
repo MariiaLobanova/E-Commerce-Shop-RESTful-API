@@ -52,7 +52,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin",
                                 "/products/add",
                                 "products/delete/{id}",
-                                "products/update/{productId}").hasAuthority("ADMIN")
+                                "products/update/{productId}",
+                                "order/status/{orderId}",
+                                "order/cancel/{orderId}").permitAll()
                         .requestMatchers(
                                 "products/id/{productId}",
                                 "/api/v1/auth/signup",

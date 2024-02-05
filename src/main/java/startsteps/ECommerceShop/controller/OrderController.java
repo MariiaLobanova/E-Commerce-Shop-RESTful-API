@@ -47,4 +47,14 @@ public class OrderController {
 
         return ResponseEntity.ok(orderStatusResponse);
     }
+    @PutMapping("/cancel/{orderId}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity <OrderStatusResponse> cancelOrder(@PathVariable Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(()-> new OrderNotFoundException("Order with id "+ orderId+ " not found"));
+
+        OrderStatusResponse orderStatusResponse = orderService.cancelOrder(order);
+
+        return ResponseEntity.ok(orderStatusResponse);
+    }
 }
