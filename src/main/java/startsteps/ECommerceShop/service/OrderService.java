@@ -12,6 +12,7 @@ import startsteps.ECommerceShop.repository.UserRepository;
 import startsteps.ECommerceShop.responce.CartProductResponse;
 import startsteps.ECommerceShop.responce.CartResponse;
 import startsteps.ECommerceShop.responce.OrderResponse;
+import startsteps.ECommerceShop.responce.OrderStatusResponse;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -30,21 +31,21 @@ public class OrderService {
     private final ProductService productService;
 
     @Transactional
-    public OrderResponse placeOrder(User user){
+    public OrderResponse placeOrder(User user) {
         CartResponse cartResponse = cartService.getCart(user);
 
-        if (cartResponse.getCartProducts().isEmpty()){
-            return new OrderResponse("Can not place empty order", Collections.emptyList(),0.0);
+        if (cartResponse.getCartProducts().isEmpty()) {
+            return new OrderResponse("Can not place empty order", Collections.emptyList(), 0.0);
         }
-        List <CartProductResponse> cartProducts = cartResponse.getCartProducts();
-        for(CartProductResponse cartProductResponse: cartProducts){
+        List<CartProductResponse> cartProducts = cartResponse.getCartProducts();
+        for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
             int orderQuantity = cartProductResponse.getQuantity();
 
             Product product = productService.getProductById(productId)
-                    .orElseThrow(()-> new ProductNotFoundException("Product with Id " +productId+ " not found"));
-            if(product.getQuantity()<orderQuantity){
-                return  new OrderResponse("Insufficient stock for product "+product.getName(), cartProducts, 0.0);
+                    .orElseThrow(() -> new ProductNotFoundException("Product with Id " + productId + " not found"));
+            if (product.getQuantity() < orderQuantity) {
+                return new OrderResponse("Insufficient stock for product " + product.getName(), cartProducts, 0.0);
             }
         }
 
@@ -53,21 +54,21 @@ public class OrderService {
         order.setOrderStatus(OrderStatus.PAID);
         order.setUser(user);
 
-        List<CartProduct> productsInCart= user.getCart().getCartProductList();
+        List<CartProduct> productsInCart = user.getCart().getCartProductList();
 
         List<CartProduct> productsInOrder = productsInCart.stream()
                 .map(cartProduct -> cartProductRepository.findById(cartProduct.getCartProductId())
-                        .orElseThrow(()->new IllegalStateException("Cart Products not found"))).collect(Collectors.toList());
+                        .orElseThrow(() -> new IllegalStateException("Cart Products not found"))).collect(Collectors.toList());
         order.setOrderCartProducts(productsInOrder);
         order.setTotal(user.getCart().getTotalPrice());
 
         Order savedOrder = orderRepository.save(order);
 
-        for (CartProductResponse cartProductResponse : cartProducts){
+        for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
             int orderQuantity = cartProductResponse.getQuantity();
 
-            productService.updateProduct(productId,orderQuantity);
+            productService.updateProduct(productId, orderQuantity);
         }
 
         cartService.clearCart(user);
@@ -79,5 +80,44 @@ public class OrderService {
         orderResponse.setTotalPrice(cartResponse.getTotalPrice());
 
         return orderResponse;
+    }
+
+    @Transactional
+    public OrderStatusResponse changeOrderStatus(Order order) {
+        OrderStatus currentStatus = order.getOrderStatus();
+
+        if (currentStatus == OrderStatus.PAID) {
+            order.setOrderStatus(OrderStatus.DISPATCHED);
+            orderRepository.save(order);
+        } else if (currentStatus == OrderStatus.DISPATCHED) {
+            order.setOrderStatus(OrderStatus.IN_TRANSIT);
+            orderRepository.save(order);
+        }else if (currentStatus == OrderStatus.IN_TRANSIT) {
+            order.setOrderStatus(OrderStatus.DELIVERED);
+            orderRepository.save(order);
+        } else if (currentStatus == OrderStatus.DELIVERED) {
+            order.setOrderStatus(OrderStatus.CLOSED);
+            orderRepository.save(order);
+        }else {
+            throw new IllegalStateException("Invalid state transition for order status");
+        }
+        return new OrderStatusResponse("Order status changed successfully!",
+                Collections.emptyList(),
+                order.getTotal(),
+                order.getOrderStatus());
+    }
+    public OrderStatusResponse cancelOrder(Order order){
+        OrderStatus currentStatus = order.getOrderStatus();
+
+        if (currentStatus == OrderStatus.PAID) {
+            order.setOrderStatus(OrderStatus.CANCELLED);
+            orderRepository.save(order);
+        } else {
+            throw new IllegalStateException("Sorry, you can not cancel your order since it is dispatched");
+        }
+        return new OrderStatusResponse("Your order is cancelled",
+                Collections.emptyList(),
+                order.getTotal(),
+                order.getOrderStatus());
     }
 }
