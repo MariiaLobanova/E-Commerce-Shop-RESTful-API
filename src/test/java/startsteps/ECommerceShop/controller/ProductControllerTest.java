@@ -77,7 +77,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.name").value("newproduct"))
                 .andExpect(jsonPath("$.description").value("newDescription"))
                 .andExpect(jsonPath("$.price").value(3.00))
-                .andExpect(jsonPath("$.quantity").value(6));;
+                .andExpect(jsonPath("$.quantity").value(6));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package startsteps.ECommerceShop.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,19 +38,19 @@ public class CartController {
         return ResponseEntity.ok(cartResponse);
     }
 
-    @GetMapping("/mycart")
+    @GetMapping(value = "/mycart")
     @PreAuthorize("hasAuthority('USER')")
-   public CartResponse getCart(){
+   public ResponseEntity<CartResponse> getCart(){
         User user = authService.getAuthenticatedUser();
         CartResponse cartResponse = cartService.getCart(user);
-        return cartResponse;
+        return ResponseEntity.ok(cartResponse);
     }
     @DeleteMapping("remove/{productId}")
     @PreAuthorize("hasAuthority('USER')")
-    public CartResponse removeProduct(@PathVariable Long productId){
+    public ResponseEntity<CartResponse> removeProduct(@PathVariable Long productId){
         User user = authService.getAuthenticatedUser();
         CartResponse cartResponse = cartService.removeProduct(productId, user);
 
-        return cartResponse;
+        return ResponseEntity.ok(cartResponse);
     }
 }
