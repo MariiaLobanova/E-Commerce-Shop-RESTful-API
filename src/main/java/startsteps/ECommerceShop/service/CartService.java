@@ -8,7 +8,9 @@ import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
 import startsteps.ECommerceShop.entities.Product;
 import startsteps.ECommerceShop.entities.User;
+import startsteps.ECommerceShop.exceptions.CartNotFoundException;
 import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
+import startsteps.ECommerceShop.exceptions.UnauthorizedAccessException;
 import startsteps.ECommerceShop.repository.CartRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
 import startsteps.ECommerceShop.request.CartRequest;
@@ -131,6 +133,17 @@ public class CartService {
             return new CartResponse("Product with id" + productId + "removed successfully", cartProductResponses, cart.getTotalPrice());
         } else {
             throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
+        }
+    }
+
+    @Transactional
+    public void clearCart(User user) {
+            Cart cart = user.getCart();
+        if(cart!=null && !cart.getCartProductList().isEmpty()) {
+            cart.getCartProductList().clear();
+            updateCartTotalPrice(cart);
+            cartRepository.save(cart);
+            log.info("Cart is empty for user: {}", user.getUsername());
         }
     }
 }

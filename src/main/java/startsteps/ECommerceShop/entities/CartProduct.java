@@ -33,4 +33,8 @@ public class CartProduct {
     @JoinColumn(name = "cartId")
     private Cart cart;
 
+    @ManyToOne
+    @ToString.Exclude
+    @JoinColumn(name = "orderId")
+    private Order order;
 }
