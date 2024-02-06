@@ -44,6 +44,10 @@ public class User implements UserDetails {
     @JoinColumn(name = "cartId")
     private Cart cart;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Order> orders = new ArrayList<>();
+
     public User(Long id, String username, String email, String password, Role role) {
         this.id = id;
         this.username = username;

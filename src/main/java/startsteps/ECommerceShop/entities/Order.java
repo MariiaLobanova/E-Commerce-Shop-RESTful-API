@@ -7,6 +7,7 @@ import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "orders")
 public class Order {
+    @ToString.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
@@ -36,6 +38,7 @@ public class Order {
     @JoinColumn(name = "userId", referencedColumnName = "id" )
     private User user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CartProduct> orderCartProducts = new ArrayList<>();
 }

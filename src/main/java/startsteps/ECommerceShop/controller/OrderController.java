@@ -5,15 +5,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import startsteps.ECommerceShop.entities.Order;
-import startsteps.ECommerceShop.entities.OrderStatus;
 import startsteps.ECommerceShop.entities.User;
 import startsteps.ECommerceShop.exceptions.OrderNotFoundException;
 import startsteps.ECommerceShop.repository.OrderRepository;
 import startsteps.ECommerceShop.responce.OrderResponse;
 import startsteps.ECommerceShop.responce.OrderStatusResponse;
+import startsteps.ECommerceShop.responce.OrdersResponse;
 import startsteps.ECommerceShop.service.AuthServiceImpl;
 import startsteps.ECommerceShop.service.OrderService;
 import startsteps.ECommerceShop.service.UserServiceImpl;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/order")
@@ -56,5 +58,12 @@ public class OrderController {
         OrderStatusResponse orderStatusResponse = orderService.cancelOrder(order);
 
         return ResponseEntity.ok(orderStatusResponse);
+    }
+    @GetMapping("/getorders")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity <OrdersResponse> getAllOrders (){
+        User user = authService.getAuthenticatedUser();
+        OrdersResponse orders = orderService.getAllOrders(user);
+        return ResponseEntity.ok(orders);
     }
 }

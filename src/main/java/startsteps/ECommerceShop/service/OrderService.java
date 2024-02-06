@@ -9,12 +9,10 @@ import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.CartProductRepository;
 import startsteps.ECommerceShop.repository.OrderRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
-import startsteps.ECommerceShop.responce.CartProductResponse;
-import startsteps.ECommerceShop.responce.CartResponse;
-import startsteps.ECommerceShop.responce.OrderResponse;
-import startsteps.ECommerceShop.responce.OrderStatusResponse;
+import startsteps.ECommerceShop.responce.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,5 +119,23 @@ public class OrderService {
                 Collections.emptyList(),
                 order.getTotal(),
                 order.getOrderStatus());
+    }
+
+    @Transactional
+    public OrdersResponse getAllOrders(User user){
+        List<Order> orders = orderRepository.findAllByUser(user);
+
+        if (orders.isEmpty()){
+            return new OrdersResponse("You don't have any placed orders yet", Collections.emptyList());
+        }
+        List<Order> fetchedOrders = new ArrayList<>();
+        for (Order order : orders) {
+            Order fetchedOrder = orderRepository.findById(order.getOrderId()).orElseThrow(null);
+            List<CartProduct> orderProducts = fetchedOrder.getOrderCartProducts();
+            for(CartProduct cp: orderProducts){
+                cp.getProduct();}
+                fetchedOrders.add(fetchedOrder);
+        }
+        return new OrdersResponse("Orders details retrieved successfully",fetchedOrders);
     }
 }
