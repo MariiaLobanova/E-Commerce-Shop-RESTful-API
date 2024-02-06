@@ -1,5 +1,6 @@
 package startsteps.ECommerceShop.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class OrderService {
 
         List<CartProduct> productsInOrder = productsInCart.stream()
                 .map(cartProduct -> cartProductRepository.findById(cartProduct.getCartProductId())
-                        .orElseThrow(() -> new IllegalStateException("Cart Products not found"))).collect(Collectors.toList());
+                        .orElseThrow(() -> new IllegalStateException("Cart not found"))).collect(Collectors.toList());
         order.setOrderCartProducts(productsInOrder);
         order.setTotal(user.getCart().getTotalPrice());
 
@@ -71,7 +72,6 @@ public class OrderService {
 
             productService.updateProduct(productId, orderQuantity);
         }
-
         cartService.clearCart(user);
 
         OrderResponse orderResponse = new OrderResponse();
@@ -131,9 +131,10 @@ public class OrderService {
         List<Order> fetchedOrders = new ArrayList<>();
         for (Order order : orders) {
             Order fetchedOrder = orderRepository.findById(order.getOrderId()).orElseThrow(null);
-            List<CartProduct> orderProducts = fetchedOrder.getOrderCartProducts();
-            for(CartProduct cp: orderProducts){
-                cp.getProduct();}
+            for(CartProduct cp: fetchedOrder.getOrderCartProducts()){
+                Product product = cp.getProduct();
+                cp.setProduct(product);
+            }
                 fetchedOrders.add(fetchedOrder);
         }
         return new OrdersResponse("Orders details retrieved successfully",fetchedOrders);

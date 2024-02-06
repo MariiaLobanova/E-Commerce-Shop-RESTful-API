@@ -37,4 +37,12 @@ public class CartProduct {
     @ToString.Exclude
     @JoinColumn(name = "orderId")
     private Order order;
+
+    public CartProduct(Long cartProductId, int quantity, double price, Product product, Cart cart) {
+        this.cartProductId = cartProductId;
+        this.quantity = quantity;
+        this.price = price;
+        this.product = product;
+        this.cart = cart;
+    }
 }
