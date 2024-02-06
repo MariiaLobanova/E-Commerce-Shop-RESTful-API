@@ -61,15 +61,16 @@ public class OrderService {
         order.setOrderCartProducts(productsInOrder);
         order.setTotal(user.getCart().getTotalPrice());
 
-        order.getOrderCartProducts().forEach(cartProduct -> cartProduct.setOrder(null));
+        Long orderId = order.getOrderId();// i need set orderID???
+
+        order.getOrderCartProducts().forEach(cartProduct -> cartProduct.setOrder(null);//here??
         order.getOrderCartProducts().clear();
 
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
 
         for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
             int orderQuantity = cartProductResponse.getQuantity();
-
             productService.updateProduct(productId, orderQuantity);
         }
         cartService.clearCart(user);
@@ -106,6 +107,7 @@ public class OrderService {
                 order.getTotal(),
                 order.getOrderStatus());
     }
+    @Transactional
     public OrderStatusResponse cancelOrder(Order order){
         OrderStatus currentStatus = order.getOrderStatus();
 
