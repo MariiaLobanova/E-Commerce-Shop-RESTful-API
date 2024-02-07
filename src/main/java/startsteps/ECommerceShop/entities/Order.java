@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "orders")
@@ -38,7 +38,13 @@ public class Order {
     @JoinColumn(name = "userId", referencedColumnName = "id" )
     private User user;
 
+    @JsonIgnore
     @ToString.Exclude
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<CartProduct> orderCartProducts = new ArrayList<>();
+    private List<CartProduct> cartProductList = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<OrderProduct> orderProductList = new ArrayList<>();
+
 }

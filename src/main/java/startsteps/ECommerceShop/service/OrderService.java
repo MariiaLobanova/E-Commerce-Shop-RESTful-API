@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import startsteps.ECommerceShop.entities.*;
+import startsteps.ECommerceShop.exceptions.CartNotFoundException;
 import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.CartProductRepository;
+import startsteps.ECommerceShop.repository.OrderProductRepository;
 import startsteps.ECommerceShop.repository.OrderRepository;
 import startsteps.ECommerceShop.repository.UserRepository;
 import startsteps.ECommerceShop.responce.*;
@@ -28,15 +30,27 @@ public class OrderService {
     private final CartService cartService;
     private final CartProductRepository cartProductRepository;
     private final ProductService productService;
+    private final OrderProductRepository orderProductRepository;
 
     @Transactional
     public OrderResponse placeOrder(User user) {
+        log.info("Placing order for user: {}", user.getUsername());
         CartResponse cartResponse = cartService.getCart(user);
 
         if (cartResponse.getCartProducts().isEmpty()) {
             return new OrderResponse("Can not place empty order", Collections.emptyList(), 0.0);
         }
         List<CartProductResponse> cartProducts = cartResponse.getCartProducts();
+
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        double totalPrice = 0.0;
+
+        Order order = new Order();
+        order.setDate(LocalDate.now());
+        order.setOrderStatus(OrderStatus.PAID);
+        order.setUser(user);
+        order = orderRepository.save(order);
+
         for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
             int orderQuantity = cartProductResponse.getQuantity();
@@ -46,27 +60,18 @@ public class OrderService {
             if (product.getQuantity() < orderQuantity) {
                 return new OrderResponse("Insufficient stock for product " + product.getName(), cartProducts, 0.0);
             }
+
+            OrderProduct orderProduct = new OrderProduct();
+            orderProduct.setName(product.getName());
+            orderProduct.setPrice(product.getPrice());
+            orderProduct.setQuantity(orderQuantity);
+            orderProduct.setOrderStatus(OrderStatus.PAID);
+            orderProduct.setOrder(order);
+            totalPrice += orderProduct.getPrice() * orderProduct.getQuantity();
+            orderProducts.add(orderProduct);
         }
-
-        Order order = new Order();
-        order.setDate(LocalDate.now());
-        order.setOrderStatus(OrderStatus.PAID);
-        order.setUser(user);
-
-        List<CartProduct> productsInCart = user.getCart().getCartProductList();
-
-        List<CartProduct> productsInOrder = productsInCart.stream()
-                .map(cartProduct -> cartProductRepository.findById(cartProduct.getCartProductId())
-                        .orElseThrow(() -> new IllegalStateException("Cart not found"))).collect(Collectors.toList());
-        order.setOrderCartProducts(productsInOrder);
-        order.setTotal(user.getCart().getTotalPrice());
-
-        Long orderId = order.getOrderId();// i need set orderID???
-
-        order.getOrderCartProducts().forEach(cartProduct -> cartProduct.setOrder(null);//here??
-        order.getOrderCartProducts().clear();
-
-        orderRepository.save(order);
+        order.setTotal(totalPrice);
+        orderProductRepository.saveAll(orderProducts);
 
         for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
@@ -123,22 +128,13 @@ public class OrderService {
                 order.getOrderStatus());
     }
 
-    @Transactional
-    public OrdersResponse getAllOrders(User user){
-        List<Order> orders = orderRepository.findAllByUser(user);
+  @Transactional
+  public OrdersResponse getAllOrders(User user) {
+      List<Order> orders = orderRepository.findAllByUserWithOrderProducts(user);
 
-        if (orders.isEmpty()){
-            return new OrdersResponse("You don't have any placed orders yet", Collections.emptyList());
-        }
-        List<Order> fetchedOrders = new ArrayList<>();
-        for (Order order : orders) {
-            Order fetchedOrder = orderRepository.findById(order.getOrderId()).orElseThrow(null);
-            for(CartProduct cp: fetchedOrder.getOrderCartProducts()){
-                Product product = cp.getProduct();
-                cp.setProduct(product);
-            }
-                fetchedOrders.add(fetchedOrder);
-        }
-        return new OrdersResponse("Orders details retrieved successfully",fetchedOrders);
-    }
+      if (orders.isEmpty()) {
+          return new OrdersResponse("You don't have any placed orders yet", Collections.emptyList());
+      }
+      return new OrdersResponse("Orders details retrieved successfully", orders);
+  }
 }
