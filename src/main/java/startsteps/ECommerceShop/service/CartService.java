@@ -141,15 +141,14 @@ public class CartService {
  @Transactional
     public void clearCart(User user) {
             Cart cart = user.getCart();
+     log.info("Clearing cart for user: {}", user.getUsername());
         if(cart!=null && !cart.getCartProductList().isEmpty()) {
             List <CartProduct> cartProductToRemove = cart.getCartProductList();
             for(CartProduct cp: cartProductToRemove){
                 cp.setOrder(null);
             }
-            cart.getCartProductList().clear();
-            updateCartTotalPrice(cart);
+            cartProductToRemove.clear();
             cartRepository.save(cart);
-            log.info("Cart is empty for user: {}", user.getUsername());
         }
     }
 }

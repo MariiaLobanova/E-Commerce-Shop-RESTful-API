@@ -54,7 +54,8 @@ public class SecurityConfig {
                                 "products/delete/{id}",
                                 "products/update/{productId}",
                                 "order/status/{orderId}",
-                                "order/cancel/{orderId}").permitAll()
+                                "order/cancel/{orderId}",
+                                "order/getorders").permitAll()
                         .requestMatchers(
                                 "products/id/{productId}",
                                 "/api/v1/auth/signup",
