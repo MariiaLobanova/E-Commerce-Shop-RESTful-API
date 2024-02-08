@@ -6,4 +6,5 @@ import startsteps.ECommerceShop.entities.Cart;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
+    public Cart findCartByCartId(Long cartId);
 }

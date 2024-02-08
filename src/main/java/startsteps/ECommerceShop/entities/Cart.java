@@ -28,7 +28,7 @@ public class Cart {
     private User user;
 
     @Column(name = "cartProducts")
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
     private List<CartProduct> cartProductList = new ArrayList<>();
 
     @Column(name = "totalPrice")

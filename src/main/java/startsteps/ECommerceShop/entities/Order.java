@@ -36,6 +36,6 @@ public class Order {
     @JoinColumn(name = "userId", referencedColumnName = "id" )
     private User user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
     private List<CartProduct> orderCartProducts = new ArrayList<>();
 }
