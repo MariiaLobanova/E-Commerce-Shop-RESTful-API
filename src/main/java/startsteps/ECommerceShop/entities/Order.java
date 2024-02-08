@@ -19,7 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "orders")
 public class Order {
-    @ToString.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
@@ -41,10 +40,10 @@ public class Order {
     @JsonIgnore
     @ToString.Exclude
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<CartProduct> cartProductList = new ArrayList<>();
+    private List<CartProduct> cartProductList;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-    private List<OrderProduct> orderProductList = new ArrayList<>();
+    private List<OrderProduct> orderProductList;
 
 }

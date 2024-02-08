@@ -8,6 +8,7 @@ import startsteps.ECommerceShop.entities.Order;
 import startsteps.ECommerceShop.entities.User;
 import startsteps.ECommerceShop.exceptions.OrderNotFoundException;
 import startsteps.ECommerceShop.repository.OrderRepository;
+import startsteps.ECommerceShop.responce.HistoryResponse;
 import startsteps.ECommerceShop.responce.OrderResponse;
 import startsteps.ECommerceShop.responce.OrderStatusResponse;
 import startsteps.ECommerceShop.responce.OrdersResponse;
@@ -65,5 +66,12 @@ public class OrderController {
         User user = authService.getAuthenticatedUser();
         OrdersResponse orders = orderService.getAllOrders(user);
         return ResponseEntity.ok(orders);
+    }
+    @GetMapping("/gethistory")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<HistoryResponse> getHistory(){
+        User user = authService.getAuthenticatedUser();
+        HistoryResponse response = orderService.getHistory(user);
+        return ResponseEntity.ok(response);
     }
 }

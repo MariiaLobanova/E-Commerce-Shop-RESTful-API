@@ -8,13 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import startsteps.ECommerceShop.entities.*;
 import startsteps.ECommerceShop.exceptions.CartNotFoundException;
 import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
-import startsteps.ECommerceShop.repository.CartProductRepository;
-import startsteps.ECommerceShop.repository.OrderProductRepository;
-import startsteps.ECommerceShop.repository.OrderRepository;
-import startsteps.ECommerceShop.repository.UserRepository;
+import startsteps.ECommerceShop.repository.*;
 import startsteps.ECommerceShop.responce.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +29,7 @@ public class OrderService {
     private final CartProductRepository cartProductRepository;
     private final ProductService productService;
     private final OrderProductRepository orderProductRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
 
     @Transactional
     public OrderResponse placeOrder(User user) {
@@ -87,26 +86,32 @@ public class OrderService {
 
         return orderResponse;
     }
-
     @Transactional
     public OrderStatusResponse changeOrderStatus(Order order) {
         OrderStatus currentStatus = order.getOrderStatus();
+        OrderStatus newStatus;
 
         if (currentStatus == OrderStatus.PAID) {
-            order.setOrderStatus(OrderStatus.DISPATCHED);
-            orderRepository.save(order);
+            newStatus = OrderStatus.DISPATCHED;
         } else if (currentStatus == OrderStatus.DISPATCHED) {
-            order.setOrderStatus(OrderStatus.IN_TRANSIT);
-            orderRepository.save(order);
+            newStatus = OrderStatus.IN_TRANSIT;
         }else if (currentStatus == OrderStatus.IN_TRANSIT) {
-            order.setOrderStatus(OrderStatus.DELIVERED);
-            orderRepository.save(order);
+            newStatus = OrderStatus.DELIVERED;
         } else if (currentStatus == OrderStatus.DELIVERED) {
-            order.setOrderStatus(OrderStatus.CLOSED);
-            orderRepository.save(order);
+            newStatus = OrderStatus.CLOSED;
         }else {
             throw new IllegalStateException("Invalid state transition for order status");
         }
+        order.setOrderStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+
+        OrderHistory history= new OrderHistory();
+        history.setOldStatus(currentStatus);
+        history.setNewStatus(newStatus);
+        history.setModifyDate(LocalDateTime.now());
+        history.setOrder(updatedOrder);
+        orderHistoryRepository.save(history);
+
         return new OrderStatusResponse("Order status changed successfully!",
                 Collections.emptyList(),
                 order.getTotal(),
@@ -115,26 +120,42 @@ public class OrderService {
     @Transactional
     public OrderStatusResponse cancelOrder(Order order){
         OrderStatus currentStatus = order.getOrderStatus();
+        OrderStatus newStatus;
 
         if (currentStatus == OrderStatus.PAID) {
-            order.setOrderStatus(OrderStatus.CANCELLED);
+            newStatus = OrderStatus.CANCELLED;
             orderRepository.save(order);
         } else {
             throw new IllegalStateException("Sorry, you can not cancel your order since it is dispatched");
         }
+        OrderHistory history= new OrderHistory();
+
+        history.setOldStatus(currentStatus);
+        history.setNewStatus(newStatus);
+        history.setModifyDate(LocalDateTime.now());
+        history.setOrder(order);
+        orderHistoryRepository.save(history);
+
         return new OrderStatusResponse("Your order is cancelled",
                 Collections.emptyList(),
                 order.getTotal(),
                 order.getOrderStatus());
     }
 
-  @Transactional
-  public OrdersResponse getAllOrders(User user) {
-      List<Order> orders = orderRepository.findAllByUserWithOrderProducts(user);
+     @Transactional
+     public OrdersResponse getAllOrders(User user) {
+         List<Order> orders = orderRepository.findAllByUserWithOrderProducts(user);
 
-      if (orders.isEmpty()) {
-          return new OrdersResponse("You don't have any placed orders yet", Collections.emptyList());
-      }
-      return new OrdersResponse("Orders details retrieved successfully", orders);
-  }
+         if (orders.isEmpty()) {
+             return new OrdersResponse("You don't have any placed orders yet", Collections.emptyList());
+         }
+         return new OrdersResponse("Orders details retrieved successfully", orders);
+     }
+
+     @Transactional(readOnly = true)
+    public HistoryResponse getHistory(User user){
+        List<OrderHistory> orderHistories = orderHistoryRepository.findByOrderUser(user);
+        return new HistoryResponse("Order history retrieved successfully", orderHistories);
+     }
+
 }
