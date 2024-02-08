@@ -127,7 +127,9 @@ public class CartService {
             CartProduct cartProductToRemove = cartProductOptional.get();
             cart.getCartProductList().remove(cartProductToRemove);
             updateCartTotalPrice(cart);
+
             cartRepository.save(cart);
+            cartProductRepository.delete(cartProductToRemove);
 
             List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
                     .map(CartProductResponse::new).collect(Collectors.toList());

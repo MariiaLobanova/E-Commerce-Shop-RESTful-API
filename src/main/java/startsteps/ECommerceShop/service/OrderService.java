@@ -34,6 +34,7 @@ public class OrderService {
     @Transactional
     public OrderResponse placeOrder(User user) {
         log.info("Placing order for user: {}", user.getUsername());
+        log.debug("Details: {}", user);
         CartResponse cartResponse = cartService.getCart(user);
 
         if (cartResponse.getCartProducts().isEmpty()) {
@@ -88,6 +89,8 @@ public class OrderService {
     }
     @Transactional
     public OrderStatusResponse changeOrderStatus(Order order) {
+        log.info("Changing order status for orderId: {}", order.getOrderId());
+        log.debug("Order details: {}", order);
         OrderStatus currentStatus = order.getOrderStatus();
         OrderStatus newStatus;
 
@@ -119,6 +122,8 @@ public class OrderService {
     }
     @Transactional
     public OrderStatusResponse cancelOrder(Order order){
+        log.info("Cancelling order for orderId: {}", order.getOrderId());
+        log.debug("Details of cancelling order: {}", order);
         OrderStatus currentStatus = order.getOrderStatus();
         OrderStatus newStatus;
 
@@ -144,6 +149,8 @@ public class OrderService {
 
      @Transactional
      public OrdersResponse getAllOrders(User user) {
+        log.info("Retrieving all orders for user: {}", user.getUsername());
+         log.debug("Get all order details: {}", user);
          List<Order> orders = orderRepository.findAllByUserWithOrderProducts(user);
 
          if (orders.isEmpty()) {
@@ -154,6 +161,8 @@ public class OrderService {
 
      @Transactional(readOnly = true)
     public HistoryResponse getHistory(User user){
+         log.info("Retrieving history of orders for user: {}", user.getUsername());
+         log.debug("get whole hystory details: {}", user);
         List<OrderHistory> orderHistories = orderHistoryRepository.findByOrderUser(user);
         return new HistoryResponse("Order history retrieved successfully", orderHistories);
      }
