@@ -2,6 +2,8 @@ package startsteps.ECommerceShop.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import startsteps.ECommerceShop.entities.Cart;
@@ -29,6 +31,8 @@ public class CartService {
     private final ProductService productService;
     private final UserRepository userRepository;
     private final CartProductRepository cartProductRepository;
+
+    private static Logger logger = LoggerFactory.getLogger(CartService.class);
 
     @Transactional
     public CartResponse addProductToCart(CartRequest cartRequest, User user) {
@@ -86,6 +90,7 @@ public class CartService {
         }
     }
         private void updateCartTotalPrice(Cart cart) {
+            log.info("Updating a cart: {}", cart);
             double totalPrice = cart.getCartProductList().stream()
                     .mapToDouble(CartProduct::getPrice)
                     .sum();
@@ -109,12 +114,14 @@ public class CartService {
 
         List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
                 .map(CartProductResponse::new).collect(Collectors.toList());
+        logger.debug("Cart after removing: {}", cart);
 
         return new CartResponse("Cart details retrieved successfully", cartProductResponses, cart.getTotalPrice());
     }
 
     @Transactional
     public CartResponse removeProduct(Long productId, User user) {
+        log.info("Removing product from cart:{} by user: {}", productId, user.getUsername());
         Cart cart = user.getCart();
 
         if (cart == null || cart.getCartProductList().isEmpty()) {
@@ -127,19 +134,26 @@ public class CartService {
             CartProduct cartProductToRemove = cartProductOptional.get();
             cart.getCartProductList().remove(cartProductToRemove);
             updateCartTotalPrice(cart);
+
             cartRepository.save(cart);
+            logger.debug("Cart after removing: {}", cart);
+            cartProductRepository.delete(cartProductToRemove);
+            logger.debug("CartproductToRemove: {}", cartProductToRemove);
 
             List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
                     .map(CartProductResponse::new).collect(Collectors.toList());
+            logger.debug("CartproductResponse: {}", cartProductResponses);
 
             return new CartResponse("Product with id " + productId + " removed successfully", cartProductResponses, cart.getTotalPrice());
         } else {
             throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
         }
+
     }
 
  @Transactional
     public void clearCart(User user) {
+     log.info("Removing all products from cart after placing order by user: {}", user.getUsername());
             Cart cart = user.getCart();
      log.info("Clearing cart for user: {}", user.getUsername());
         if(cart!=null && !cart.getCartProductList().isEmpty()) {
@@ -148,7 +162,9 @@ public class CartService {
                 cp.setOrder(null);
             }
             cartProductToRemove.clear();
+            logger.debug("CartProducts for removing: {}", cartProductToRemove);
             cartRepository.save(cart);
+            logger.debug("Cart after replacing order: {}", cart);
         }
     }
 }
