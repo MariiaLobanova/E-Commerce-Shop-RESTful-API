@@ -71,6 +71,7 @@ public class OrderService {
             orderProducts.add(orderProduct);
         }
         order.setTotal(totalPrice);
+        order =orderRepository.save(order);
         orderProductRepository.saveAll(orderProducts);
 
         for (CartProductResponse cartProductResponse : cartProducts) {

@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 import startsteps.ECommerceShop.entities.Cart;
 import startsteps.ECommerceShop.entities.CartProduct;
@@ -32,7 +34,6 @@ public class CartService {
     private final ProductService productService;
     private final UserRepository userRepository;
     private final CartProductRepository cartProductRepository;
-    private final CartProductService cartProductService;
 
     private static Logger logger = LoggerFactory.getLogger(CartService.class);
 
@@ -121,10 +122,10 @@ public class CartService {
         return new CartResponse("Cart details retrieved successfully", cartProductResponses, cart.getTotalPrice());
     }
 
+    @Modifying
     @Transactional
     public CartResponse removeProduct(Long productId, User user) {
         log.info("Removing product from cart:{} by user: {}", productId, user.getUsername());
-        try {
             Cart cart = user.getCart();
 
             if (cart == null || cart.getCartProductList().isEmpty()) {
@@ -150,10 +151,6 @@ public class CartService {
                 return new CartResponse("Product with id " + productId + " removed successfully", cartProductResponses, cart.getTotalPrice());
             } else {
                 throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
-            }
-        } catch (Exception e) {
-            logger.error("An error occurred while removing product from cart: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to remove product from cart", e);
         }
     }
 
@@ -167,8 +164,8 @@ public class CartService {
             for(CartProduct cp: cartProductToRemove){
                 cp.setOrder(null);
             }
-           // cartProductService.deleteCartProduct((CartProduct) cartProductToRemove);
-            cartProductToRemove.clear();
+            cartProductRepository.deleteCartProductByCartId(user.getCart().getCartId());
+
             logger.debug("CartProducts for removing: {}", cartProductToRemove);
             cartRepository.save(cart);
             logger.debug("Cart after replacing order: {}", cart);
