@@ -25,12 +25,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional
 @AllArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductService productService;
     private final UserRepository userRepository;
     private final CartProductRepository cartProductRepository;
+    private final CartProductService cartProductService;
 
     private static Logger logger = LoggerFactory.getLogger(CartService.class);
 
@@ -122,36 +124,40 @@ public class CartService {
     @Transactional
     public CartResponse removeProduct(Long productId, User user) {
         log.info("Removing product from cart:{} by user: {}", productId, user.getUsername());
-        Cart cart = user.getCart();
+        try {
+            Cart cart = user.getCart();
 
-        if (cart == null || cart.getCartProductList().isEmpty()) {
-            return new CartResponse("Can not remove any products. Your cart is empty", null, 0.00);
+            if (cart == null || cart.getCartProductList().isEmpty()) {
+                return new CartResponse("Can not remove any products. Your cart is empty", null, 0.00);
+            }
+            Optional<CartProduct> cartProductOptional = cart.getCartProductList().stream()
+                    .filter(c -> c.getProduct().getProductId().equals(productId)).findFirst();
+
+            if (cartProductOptional.isPresent()) {
+                CartProduct cartProductToRemove = cartProductOptional.get();
+                cart.getCartProductList().remove(cartProductToRemove);
+                updateCartTotalPrice(cart);
+
+                cartRepository.save(cart);
+                logger.debug("Cart after removing: {}", cart);
+                cartProductRepository.deleteOneCartProduct(cartProductToRemove.getCartProductId());
+                logger.debug("CartproductToRemove: {}", cartProductToRemove);
+
+                List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
+                        .map(CartProductResponse::new).collect(Collectors.toList());
+                logger.debug("CartproductResponse: {}", cartProductResponses);
+
+                return new CartResponse("Product with id " + productId + " removed successfully", cartProductResponses, cart.getTotalPrice());
+            } else {
+                throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred while removing product from cart: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to remove product from cart", e);
         }
-        Optional<CartProduct> cartProductOptional = cart.getCartProductList().stream()
-                .filter(c -> c.getProduct().getProductId().equals(productId)).findFirst();
-
-        if (cartProductOptional.isPresent()) {
-            CartProduct cartProductToRemove = cartProductOptional.get();
-            cart.getCartProductList().remove(cartProductToRemove);
-            updateCartTotalPrice(cart);
-
-            cartRepository.save(cart);
-            logger.debug("Cart after removing: {}", cart);
-            cartProductRepository.delete(cartProductToRemove);
-            logger.debug("CartproductToRemove: {}", cartProductToRemove);
-
-            List<CartProductResponse> cartProductResponses = cart.getCartProductList().stream()
-                    .map(CartProductResponse::new).collect(Collectors.toList());
-            logger.debug("CartproductResponse: {}", cartProductResponses);
-
-            return new CartResponse("Product with id " + productId + " removed successfully", cartProductResponses, cart.getTotalPrice());
-        } else {
-            throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
-        }
-
     }
 
- @Transactional
+    @Transactional
     public void clearCart(User user) {
      log.info("Removing all products from cart after placing order by user: {}", user.getUsername());
             Cart cart = user.getCart();
@@ -161,6 +167,7 @@ public class CartService {
             for(CartProduct cp: cartProductToRemove){
                 cp.setOrder(null);
             }
+           // cartProductService.deleteCartProduct((CartProduct) cartProductToRemove);
             cartProductToRemove.clear();
             logger.debug("CartProducts for removing: {}", cartProductToRemove);
             cartRepository.save(cart);
