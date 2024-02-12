@@ -19,6 +19,6 @@ public class CartProductResponse {
         this.productId = cartproduct.getProduct().getProductId();
         this.name = cartproduct.getProduct().getName();
         this.quantity = cartproduct.getQuantity();
-        this.price = cartproduct.getPrice()/ cartproduct.getQuantity();
+        this.price = cartproduct.getPrice()/cartproduct.getQuantity();
     }
 }

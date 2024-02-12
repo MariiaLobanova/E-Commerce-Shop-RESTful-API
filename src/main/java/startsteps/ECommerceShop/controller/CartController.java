@@ -53,4 +53,13 @@ public class CartController {
 
         return ResponseEntity.ok(cartResponse);
     }
+    @DeleteMapping("reduce/{productId}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<CartResponse> reduceProduct(@PathVariable Long productId){
+        User user = authService.getAuthenticatedUser();
+        CartResponse cartResponse = cartService.reduceProduct(productId, user);
+
+        return ResponseEntity.ok(cartResponse);
+    }
+
 }

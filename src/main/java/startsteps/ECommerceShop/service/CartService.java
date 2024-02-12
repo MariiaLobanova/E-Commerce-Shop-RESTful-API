@@ -153,6 +153,38 @@ public class CartService {
                 throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");
         }
     }
+    @Transactional
+    public CartResponse reduceProduct(Long productId, User user) {
+        log.info("Reducing by 1 product from cart:{} by user: {}", productId, user.getUsername());
+        Cart cart = user.getCart();
+
+        if (cart == null || cart.getCartProductList().isEmpty()) {
+            return new CartResponse("Can not remove any products. Your cart is empty", null, 0.00);
+        }
+        Optional<CartProduct> cartProductOptional = cart.getCartProductList().stream()
+                .filter(c -> c.getProduct().getProductId().equals(productId)).findFirst();
+
+        if (cartProductOptional.isPresent()) {
+            CartProduct cartProduct = cartProductOptional.get();
+            int currentQuantity = cartProduct.getQuantity();
+
+            if (currentQuantity == 1) {
+                cart.getCartProductList().remove(cartProduct);
+                updateCartTotalPrice(cart);
+                cartRepository.save(cart);
+                cartProductRepository.deleteOneCartProduct(cartProduct.getCartProductId());
+            } else {
+                cartProduct.setQuantity(currentQuantity - 1);
+                cartProduct.setPrice(cartProduct.getPrice() - cartProduct.getProduct().getPrice());
+                updateCartTotalPrice(cart);
+                cartRepository.save(cart);
+            }
+            return new CartResponse("Quantity of product with ID " + productId + " reduced by 1",
+                    createCartProduct(cart.getCartProductList()),
+                    cart.getTotalPrice());
+        }else {
+            throw new ProductNotFoundException("Product with ID " + productId + " not found in your cart.");}
+    }
 
     @Transactional
     public void clearCart(User user) {
