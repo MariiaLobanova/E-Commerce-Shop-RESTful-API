@@ -167,6 +167,7 @@ public class CartService {
             cartProductRepository.deleteCartProductByCartId(user.getCart().getCartId());
 
             logger.debug("CartProducts for removing: {}", cartProductToRemove);
+            cart.setTotalPrice(0.0);
             cartRepository.save(cart);
             logger.debug("Cart after replacing order: {}", cart);
         }
