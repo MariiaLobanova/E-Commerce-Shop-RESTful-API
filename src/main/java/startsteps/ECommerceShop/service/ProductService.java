@@ -36,7 +36,7 @@ public class ProductService {
     }
     public List<Product> findProductsByName(String name) {
         log.info("Finding product by name: {}", name);
-        return productRepository.findByName(name);
+        return productRepository.findByNameContainingIgnoreCase(name);
     }
     public Product updateProduct (Long id, int quantity){
         log.info("Updating quatities:{} of products by id: {}",quantity, id);
