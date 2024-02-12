@@ -22,19 +22,36 @@ Access the Swagger API documentation at http://localhost:8090/swagger-ui/index.h
 for comprehensive API details and testing.
 
 Diagram for the application
-![img_1.png](img_1.png)
+![img_1.png](/private/var/folders/qg/yht8b_s928v21qprj0fmgclh0000gn/T/com.apple.Photos.NSItemProvider/version=1&uuid=29757743-E282-4803-9FFB-D568E1CCB53B&mode=compatible&noloc=0.jpeg/Image 09.02.24 at 09.47.jpeg)
 
 Modules: 
-- User;
-- Product;
-- Cart;
-- Order.
+- User,
+- Product,
+- CartProduct,
+- Cart,
+- Order,
+- OrderProduct,
+- OrderHistory.
 
 Features:
 
 - User authentication and validation with session token having validity of 24 hours for security purpose,
-- Admin Role with valid session token can add/delete/uddate products and see whole list of users,
-- All users can see products and logged in User as a Role with valid session token can add products to a cart, 
-see list of products in the cart, placing orders, see history and status of his orders.
+- All users can see a list of products with pagination,
+- The Admin Role, with a valid session token, can:
+       add products to the list,
+       delete products from the list,
+       update products,
+       view the entire list of users,
+       change status of orders. 
+- All users can see products, and logged-in users with the role 'User' and a valid session token can:
+       add products to a cart,
+       see the list of products in the cart,
+       place orders,
+       cancel orders,
+       see all their orders,
+       sse history of orders, including status updates.
+
+
+
 
  

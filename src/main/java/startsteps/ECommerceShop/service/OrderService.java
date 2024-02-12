@@ -41,15 +41,8 @@ public class OrderService {
             return new OrderResponse("Can not place empty order", Collections.emptyList(), 0.0);
         }
         List<CartProductResponse> cartProducts = cartResponse.getCartProducts();
-
         List<OrderProduct> orderProducts = new ArrayList<>();
         double totalPrice = 0.0;
-
-        Order order = new Order();
-        order.setDate(LocalDate.now());
-        order.setOrderStatus(OrderStatus.PAID);
-        order.setUser(user);
-        order = orderRepository.save(order);
 
         for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
@@ -57,9 +50,18 @@ public class OrderService {
 
             Product product = productService.getProductById(productId)
                     .orElseThrow(() -> new ProductNotFoundException("Product with Id " + productId + " not found"));
-            if (product.getQuantity() < orderQuantity) {
-                return new OrderResponse("Insufficient stock for product " + product.getName(), cartProducts, 0.0);
+
+            if (orderQuantity > product.getQuantity()) {
+                return new OrderResponse("Insufficient stock for product " + product.getName(), Collections.emptyList(), 0.0);
             }
+            int newQuantity = product.getQuantity() - orderQuantity;
+            productService.updateProduct(productId, newQuantity);
+
+            Order order = new Order();
+            order.setDate(LocalDate.now());
+            order.setOrderStatus(OrderStatus.PAID);
+            order.setUser(user);
+            order = orderRepository.save(order);
 
             OrderProduct orderProduct = new OrderProduct();
             orderProduct.setName(product.getName());
@@ -69,15 +71,12 @@ public class OrderService {
             orderProduct.setOrder(order);
             totalPrice += orderProduct.getPrice() * orderProduct.getQuantity();
             orderProducts.add(orderProduct);
-        }
-        order.setTotal(totalPrice);
-        orderProductRepository.saveAll(orderProducts);
 
-        for (CartProductResponse cartProductResponse : cartProducts) {
-            Long productId = cartProductResponse.getProductId();
-            int orderQuantity = cartProductResponse.getQuantity();
-            productService.updateProduct(productId, orderQuantity);
+            order.setTotal(totalPrice);
+            order = orderRepository.save(order);
+            orderProductRepository.saveAll(orderProducts);
         }
+
         cartService.clearCart(user);
 
         OrderResponse orderResponse = new OrderResponse();
