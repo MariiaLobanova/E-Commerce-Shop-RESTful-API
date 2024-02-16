@@ -1,28 +1,17 @@
 package startsteps.ECommerceShop.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import startsteps.ECommerceShop.entities.Order;
-import startsteps.ECommerceShop.entities.OrderStatus;
-import startsteps.ECommerceShop.entities.Role;
-import startsteps.ECommerceShop.entities.User;
+import startsteps.ECommerceShop.entities.*;
+import startsteps.ECommerceShop.repository.OrderHistoryRepository;
 import startsteps.ECommerceShop.repository.OrderRepository;
+import startsteps.ECommerceShop.responce.HistoryResponse;
 import startsteps.ECommerceShop.responce.OrderResponse;
 import startsteps.ECommerceShop.responce.OrderStatusResponse;
 import startsteps.ECommerceShop.responce.OrdersResponse;
@@ -32,23 +21,16 @@ import startsteps.ECommerceShop.service.OrderService;
 import startsteps.ECommerceShop.service.UserServiceImpl;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static startsteps.ECommerceShop.entities.Role.ADMIN;
 import static startsteps.ECommerceShop.entities.Role.USER;
 
 @WebMvcTest(OrderController.class)
@@ -66,8 +48,10 @@ class OrderControllerTest {
     AuthServiceImpl authService;
     @MockBean
     OrderRepository orderRepository;
-    @InjectMocks
-    private OrderController orderController;
+    @MockBean
+    OrderHistoryRepository orderHistoryRepository;
+
+
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
@@ -119,7 +103,7 @@ class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    void getAllOrders() throws Exception {
+    void getAllOrdersSuccessfully() throws Exception {
         User user = new User(1L, "Liza", "liza@example.com", "0000", Role.USER);
         List<Order> orders = Collections.singletonList(
                 new Order(1L, LocalDate.of(2024, 2, 12), OrderStatus.PAID, 100.00));
@@ -138,6 +122,22 @@ class OrderControllerTest {
     }
 
     @Test
-    void getHistory() {
+    @WithMockUser(username = "user", roles = "USER")
+    void getHistorySuccessfully() throws Exception {
+        User user = new User(1L, "Liza", "liza@example.com", "0000", Role.USER);
+        List<OrderHistory> ordersHistory = Collections.singletonList(
+                new OrderHistory(1L,OrderStatus.PAID,OrderStatus.DISPATCHED, LocalDate.of(2024, 2, 12).atStartOfDay(), new Order()));
+
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(orderService.getHistory(user)).thenReturn(new HistoryResponse("Order history retrieved successfully",ordersHistory));
+
+        mockMvc.perform(get("/order/gethistory").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Order history retrieved successfully"))
+                .andExpect(jsonPath("$.orderHistories[0].orderHistoryId").value(1))
+                .andExpect(jsonPath("$.orderHistories[0].oldStatus").value("PAID"))
+                .andExpect(jsonPath("$.orderHistories[0].newStatus").value("DISPATCHED"))
+                .andExpect(jsonPath("$.orderHistories[0].modifyDate").value("2024-02-12T00:00:00"));
     }
 }
