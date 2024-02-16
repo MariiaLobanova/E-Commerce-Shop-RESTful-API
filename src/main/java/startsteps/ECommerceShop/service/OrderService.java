@@ -44,6 +44,12 @@ public class OrderService {
         List<OrderProduct> orderProducts = new ArrayList<>();
         double totalPrice = 0.0;
 
+        Order order = new Order();
+        order.setDate(LocalDate.now());
+        order.setOrderStatus(OrderStatus.PAID);
+        order.setUser(user);
+        order = orderRepository.save(order);
+
         for (CartProductResponse cartProductResponse : cartProducts) {
             Long productId = cartProductResponse.getProductId();
             int orderQuantity = cartProductResponse.getQuantity();
@@ -57,11 +63,6 @@ public class OrderService {
             int newQuantity = product.getQuantity() - orderQuantity;
             productService.updateProduct(productId, newQuantity);
 
-            Order order = new Order();
-            order.setDate(LocalDate.now());
-            order.setOrderStatus(OrderStatus.PAID);
-            order.setUser(user);
-            order = orderRepository.save(order);
 
             OrderProduct orderProduct = new OrderProduct();
             orderProduct.setName(product.getName());

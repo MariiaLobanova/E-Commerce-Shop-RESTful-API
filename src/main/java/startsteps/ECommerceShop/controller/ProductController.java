@@ -36,7 +36,7 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ProductResponse> addProduct(@RequestBody Product product){
         Product addedProduct = productService.addProduct(product);
-        ProductResponse response = new ProductResponse("Product added succesfully!", List.of(addedProduct));
+        ProductResponse response = new ProductResponse("Product added in a List succesfully!", List.of(addedProduct));
         return ResponseEntity.ok(response);
     }
 
