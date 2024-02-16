@@ -22,7 +22,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/cart")
-@Tag(name= "Cart managment system", description = "Endpoints for managing user shopping cart")
+@Tag(name= "Cart management system", description = "Endpoints for managing user shopping cart")
 public class CartController {
 
     @Autowired

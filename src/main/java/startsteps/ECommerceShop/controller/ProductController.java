@@ -69,6 +69,7 @@ public class ProductController {
         ProductResponse response = new ProductResponse("Product with name: "+ name,productList);
         return ResponseEntity.ok(response);
     }
+
     @PutMapping("/update/{productId}")
     @Operation(summary = "Update product", description = "Allows authorized users to update a product's quantity.")
     @PreAuthorize("hasAuthority('ADMIN')")

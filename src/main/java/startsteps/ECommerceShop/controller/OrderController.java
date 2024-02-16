@@ -40,7 +40,6 @@ public class OrderController {
     public ResponseEntity <OrderResponse> placeOrder(){
         User user =authService.getAuthenticatedUser();
         OrderResponse orderResponse = orderService.placeOrder(user);
-
         return ResponseEntity.ok(orderResponse);
     }
 
@@ -50,22 +49,20 @@ public class OrderController {
     public ResponseEntity <OrderStatusResponse> changeOrderStatus(@PathVariable Long orderId){
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderNotFoundException("Order with id "+ orderId+ " not found"));
-
         OrderStatusResponse orderStatusResponse = orderService.changeOrderStatus(order);
-
         return ResponseEntity.ok(orderStatusResponse);
     }
+
     @PutMapping("/cancel/{orderId}")
     @Operation(summary = "Cancel order", description = "Allows authenticated users to cancel their own order.")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity <OrderStatusResponse> cancelOrder(@PathVariable Long orderId){
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderNotFoundException("Order with id "+ orderId+ " not found"));
-
         OrderStatusResponse orderStatusResponse = orderService.cancelOrder(order);
-
         return ResponseEntity.ok(orderStatusResponse);
     }
+
     @GetMapping("/getorders")
     @Operation(summary = "Get all orders", description = "Retrieve all orders placed by the authenticated user.")
     @PreAuthorize("hasAuthority('USER')")
@@ -74,6 +71,7 @@ public class OrderController {
         OrdersResponse orders = orderService.getAllOrders(user);
         return ResponseEntity.ok(orders);
     }
+
     @GetMapping("/gethistory")
     @Operation(summary = "Get order history", description = "Retrieve order history for the authenticated user.")
     @PreAuthorize("hasAuthority('USER')")
