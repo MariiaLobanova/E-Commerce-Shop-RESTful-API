@@ -54,11 +54,11 @@ class ProductControllerTest {
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.content[0].name").value("testname1"))
-                .andExpect(jsonPath("$.content[1].name").value("testname2"))
-                .andExpect(jsonPath("$.content[0].description").value("testdescription1"))
-                .andExpect(jsonPath("$.content[1].price").value(2.00))
-                .andExpect(jsonPath("$.content[0].quantity").value(5));
+                .andExpect(jsonPath("$.productList[0].name").value("testname1"))
+                .andExpect(jsonPath("$.productList[1].name").value("testname2"))
+                .andExpect(jsonPath("$.productList[0].description").value("testdescription1"))
+                .andExpect(jsonPath("$.productList[1].price").value(2.00))
+                .andExpect(jsonPath("$.productList[0].quantity").value(5));
     }
 
     @Test
@@ -74,10 +74,10 @@ class ProductControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.name").value("newproduct"))
-                .andExpect(jsonPath("$.description").value("newDescription"))
-                .andExpect(jsonPath("$.price").value(3.00))
-                .andExpect(jsonPath("$.quantity").value(6));
+                .andExpect(jsonPath("$.productList[0].name").value("newproduct"))
+                .andExpect(jsonPath("$.productList[0].description").value("newDescription"))
+                .andExpect(jsonPath("$.productList[0].price").value(3.00))
+                .andExpect(jsonPath("$.productList[0].quantity").value(6));
     }
 
     @Test
@@ -103,9 +103,11 @@ class ProductControllerTest {
         mockMvc.perform(get("/products/id/{productId}",productId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("testgetproduct"))
-                .andExpect(jsonPath("$.price").value(2.00))
-                .andExpect(jsonPath("$.quantity").value(5));
+                .andExpect(jsonPath("$.message").value("Product with ID: " + productId))
+                .andExpect(jsonPath("$.productList[0].name").value("testgetproduct"))
+                .andExpect(jsonPath("$.productList[0].description").value("testdescription"))
+                .andExpect(jsonPath("$.productList[0].price").value(2.00))
+                .andExpect(jsonPath("$.productList[0].quantity").value(5));
     }
 
     @Test
@@ -119,10 +121,11 @@ class ProductControllerTest {
         mockMvc.perform(get("/products/name/{name}",name)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name").value(name))
-                .andExpect(jsonPath("$[0].price").value(2.00))
-                .andExpect(jsonPath("$[0].quantity").value(5));
+                .andExpect(jsonPath("$.message").value("Product with name: " + name))
+                .andExpect(jsonPath("$.productList", hasSize(1)))
+                .andExpect(jsonPath("$.productList[0].name").value(name))
+                .andExpect(jsonPath("$.productList[0].description").value("testdescription"))
+                .andExpect(jsonPath("$.productList[0].price").value(2.00))
+                .andExpect(jsonPath("$.productList[0].quantity").value(5));
     }
-
 }
