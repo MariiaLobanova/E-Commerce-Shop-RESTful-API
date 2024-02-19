@@ -63,7 +63,6 @@ public class CartService {
                     .findFirst();
 
             if (cartProductOptional.isPresent()) {
-
                 CartProduct cartProduct = cartProductOptional.get();
                 cartProduct.setQuantity(cartProduct.getQuantity() + quantity);
                 cartProduct.setPrice(product.getPrice() * cartProduct.getQuantity());
@@ -109,7 +108,6 @@ public class CartService {
     @Transactional
     public CartResponse getCart(User user){
         Cart cart = user.getCart();
-
         if (cart == null || cart.getCartProductList().isEmpty()){
             return new CartResponse("You haven't added anything yet, your cart is empty",Collections.emptyList(),0.0);
         }
