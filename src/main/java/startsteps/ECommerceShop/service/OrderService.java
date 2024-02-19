@@ -126,12 +126,12 @@ public class OrderService {
 
         if (currentStatus == OrderStatus.PAID) {
             newStatus = OrderStatus.CANCELLED;
+            order.setOrderStatus(newStatus);
             orderRepository.save(order);
         } else {
             throw new IllegalStateException("Sorry, you can not cancel your order since it is dispatched");
         }
         OrderHistory history= new OrderHistory();
-
         history.setOldStatus(currentStatus);
         history.setNewStatus(newStatus);
         history.setModifyDate(LocalDateTime.now());
