@@ -1,12 +1,10 @@
 package startsteps.ECommerceShop.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import startsteps.ECommerceShop.entities.*;
-import startsteps.ECommerceShop.exceptions.CartNotFoundException;
 import startsteps.ECommerceShop.exceptions.ProductNotFoundException;
 import startsteps.ECommerceShop.repository.*;
 import startsteps.ECommerceShop.responce.*;
@@ -16,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

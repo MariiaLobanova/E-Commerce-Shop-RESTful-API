@@ -5,11 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -48,4 +45,10 @@ public class Order {
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     private List<OrderProduct> orderProductList;
 
+    public Order(Long orderId, LocalDate date, OrderStatus orderStatus, double total) {
+        this.orderId = orderId;
+        this.date = date;
+        this.orderStatus = orderStatus;
+        this.total = total;
+    }
 }
