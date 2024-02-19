@@ -22,7 +22,7 @@ Access the Swagger API documentation at http://localhost:8090/swagger-ui/index.h
 for comprehensive API details and testing.
 
 Diagram for the application
-![img_1.png](/private/var/folders/qg/yht8b_s928v21qprj0fmgclh0000gn/T/com.apple.Photos.NSItemProvider/version=1&uuid=29757743-E282-4803-9FFB-D568E1CCB53B&mode=compatible&noloc=0.jpeg/Image 09.02.24 at 09.47.jpeg)
+![](/private/var/folders/qg/yht8b_s928v21qprj0fmgclh0000gn/T/com.apple.Photos.NSItemProvider/version=1&uuid=29757743-E282-4803-9FFB-D568E1CCB53B&mode=compatible&noloc=0.jpeg/Image 09.02.24 at 09.47.jpeg)
 
 Modules: 
 - User,
