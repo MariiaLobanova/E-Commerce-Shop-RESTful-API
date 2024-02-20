@@ -22,7 +22,7 @@ Access the Swagger API documentation at http://localhost:8090/swagger-ui/index.h
 for comprehensive API details and testing.
 
 Diagram for the application
-![](/Users/maria/Downloads/Image 09.02.24 at 09.47.png)
+![](diagram.png)
 
 Modules: 
 - User,
