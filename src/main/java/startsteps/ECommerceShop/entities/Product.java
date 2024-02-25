@@ -33,6 +33,7 @@ public class Product {
     @Column(name = "price")
     double price;
     @Min(0)
+    //@JsonIgnore
     @Column(name = "quantity")
     int quantity;
     @JsonIgnore

@@ -148,7 +148,7 @@ public class OrderService {
      public OrdersResponse getAllOrders(User user) {
         log.info("Retrieving all orders for user: {}", user.getUsername());
          log.debug("Get all order details: {}", user);
-         List<Order> orders = orderRepository.findAllByUserWithOrderProducts(user);
+         List<Order> orders = orderRepository.findAllByUserWithOrderProducts(user.getId());
 
          if (orders.isEmpty()) {
              return new OrdersResponse("You don't have any placed orders yet", Collections.emptyList());

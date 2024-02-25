@@ -19,6 +19,7 @@ public class OrderProduct {
     private String name;
     double price;
     int quantity;
+    @JsonIgnore
     private OrderStatus orderStatus;
     @JsonIgnore
     @ManyToOne

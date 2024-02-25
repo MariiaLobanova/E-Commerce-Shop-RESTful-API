@@ -75,7 +75,7 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity <ProductResponse> updateProduct(@PathVariable Long productId,@RequestParam int quantity){
         Product updatedProduct = productService.updateProduct(productId,quantity);
-        ProductResponse response = new ProductResponse("Product updated successfully!", List.of(updatedProduct));
+        ProductResponse response = new ProductResponse("Product with ID: "+productId+" updated successfully! Quantity = "+quantity, List.of(updatedProduct));
         return ResponseEntity.ok(response);
     }
 }
